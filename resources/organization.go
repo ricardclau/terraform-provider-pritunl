@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+
 	"github.com/dropbox/godropbox/errors"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/errortypes"
@@ -42,7 +43,7 @@ func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (
 
 	req := request.Request{
 		Method: "GET",
-		Path:   "/tf/organization",
+		Path:   "/organization",
 		Query: map[string]string{
 			"id":   sch.Id,
 			"name": sch.Name,
@@ -68,7 +69,7 @@ func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
 
 	req := request.Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/tf/organization/%s", sch.Id),
+		Path:   fmt.Sprintf("/organization/%s", sch.Id),
 		Json: &organizationPutData{
 			Name: sch.Name,
 		},
@@ -93,11 +94,13 @@ func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
 
 	req := request.Request{
 		Method: "POST",
-		Path:   "/tf/organization",
+		Path:   "/organization",
 		Json: &organizationPostData{
 			Name: sch.Name,
 		},
 	}
+
+	fmt.Println(req)
 
 	data = &organizationData{}
 
@@ -121,7 +124,7 @@ func organizationDel(prvdr *schemas.Provider, sch *schemas.Organization) (
 
 	req := request.Request{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/tf/organization/%s", sch.Id),
+		Path:   fmt.Sprintf("/organization/%s", sch.Id),
 	}
 
 	_, err = req.Do(prvdr, nil)

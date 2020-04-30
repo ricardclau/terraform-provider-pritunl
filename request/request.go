@@ -6,15 +6,16 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/dropbox/godropbox/errors"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
-	"github.com/pritunl/terraform-provider-pritunl/schemas"
-	"gopkg.in/mgo.v2/bson"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/dropbox/godropbox/errors"
+	"github.com/pritunl/terraform-provider-pritunl/errortypes"
+	"github.com/pritunl/terraform-provider-pritunl/schemas"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var client = &http.Client{

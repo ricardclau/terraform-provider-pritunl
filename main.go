@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/kihahu/terraform-provider-pritunl/utils"
 	"github.com/pritunl/terraform-provider-pritunl/provider"
-	"github.com/pritunl/terraform-provider-pritunl/utils"
 )
 
 func main() {
