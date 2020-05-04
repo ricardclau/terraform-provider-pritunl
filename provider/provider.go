@@ -2,8 +2,8 @@ package provider
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/resources"
-	"github.com/pritunl/terraform-provider-pritunl/schemas"
+	"github.com/kihahu/terraform-provider-pritunl/resources"
+	"github.com/kihahu/terraform-provider-pritunl/schemas"
 )
 
 func Provider() *schema.Provider {
@@ -24,11 +24,11 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"pritunl_organization": resources.Organization(),
-			"pritunl_user": resources.User(),
-			"pritunl_link": resources.Link(),
+			"pritunl_organization":  resources.Organization(),
+			"pritunl_user":          resources.User(),
+			"pritunl_link":          resources.Link(),
 			"pritunl_link_location": resources.LinkLocation(),
-			"pritunl_link_host": resources.LinkHost(),
+			"pritunl_link_host":     resources.LinkHost(),
 		},
 	}
 }

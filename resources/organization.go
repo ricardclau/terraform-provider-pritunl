@@ -5,9 +5,9 @@ import (
 
 	"github.com/dropbox/godropbox/errors"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
-	"github.com/pritunl/terraform-provider-pritunl/request"
-	"github.com/pritunl/terraform-provider-pritunl/schemas"
+	"github.com/kihahu/terraform-provider-pritunl/errortypes"
+	"github.com/kihahu/terraform-provider-pritunl/request"
+	"github.com/kihahu/terraform-provider-pritunl/schemas"
 )
 
 func Organization() *schema.Resource {
@@ -33,9 +33,18 @@ type organizationPutData struct {
 	Name string `json:"name"`
 }
 
+// type organizationData struct {
+// 	Id   string `json:"id"`
+// 	Name string `json:"name"`
+// }
+
 type organizationData struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Auth_api    bool   `json:auth_api`
+	Name        string `json:"name"`
+	Auth_token  bool   `json:auth_token`
+	User_count  int    `json:user_count`
+	Auth_secret string `json:auth_secret`
+	Id          string `json:"id"`
 }
 
 func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (
@@ -50,9 +59,9 @@ func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (
 		},
 	}
 
-	data = &organizationData{}
+	xdata := []organizationData{}
 
-	resp, err := req.Do(prvdr, data)
+	resp, err := req.Do(prvdr, xdata)
 	if err != nil {
 		return
 	}
@@ -75,9 +84,9 @@ func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
 		},
 	}
 
-	data = &organizationData{}
+	xdata := []organizationData{}
 
-	resp, err := req.Do(prvdr, data)
+	resp, err := req.Do(prvdr, xdata)
 	if err != nil {
 		return
 	}
@@ -99,8 +108,6 @@ func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
 			Name: sch.Name,
 		},
 	}
-
-	fmt.Println(req)
 
 	data = &organizationData{}
 

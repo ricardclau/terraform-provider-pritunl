@@ -2,11 +2,12 @@ package resources
 
 import (
 	"fmt"
+
+	"github.com/dropbox/godropbox/errors"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/pritunl/terraform-provider-pritunl/errortypes"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
-	"github.com/dropbox/godropbox/errors"
 )
 
 func User() *schema.Resource {
@@ -124,7 +125,7 @@ func userGet(prvdr *schemas.Provider, sch *schemas.User) (
 
 	req := request.Request{
 		Method: "GET",
-		Path:   fmt.Sprintf("/tf/user/%s", sch.OrganizationId),
+		Path:   fmt.Sprintf("/user/%s", sch.OrganizationId),
 		Query: map[string]string{
 			"id":   sch.Id,
 			"name": sch.Name,
@@ -150,7 +151,7 @@ func userPut(prvdr *schemas.Provider, sch *schemas.User) (
 
 	req := request.Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/tf/user/%s/%s", sch.OrganizationId, sch.Id),
+		Path:   fmt.Sprintf("/user/%s/%s", sch.OrganizationId, sch.Id),
 		Json: &userPutData{
 			Name:            sch.Name,
 			Email:           sch.Email,
@@ -185,7 +186,7 @@ func userPost(prvdr *schemas.Provider, sch *schemas.User) (
 
 	req := request.Request{
 		Method: "POST",
-		Path:   fmt.Sprintf("/tf/user/%s", sch.OrganizationId),
+		Path:   fmt.Sprintf("/user/%s", sch.OrganizationId),
 		Json: &userPostData{
 			Name:            sch.Name,
 			Email:           sch.Email,
@@ -223,7 +224,7 @@ func userDel(prvdr *schemas.Provider, sch *schemas.User) (
 
 	req := request.Request{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/tf/user/%s/%s", sch.OrganizationId, sch.Id),
+		Path:   fmt.Sprintf("/user/%s/%s", sch.OrganizationId, sch.Id),
 	}
 
 	_, err = req.Do(prvdr, nil)

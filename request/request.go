@@ -7,14 +7,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/dropbox/godropbox/errors"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
-	"github.com/pritunl/terraform-provider-pritunl/schemas"
+	"github.com/kihahu/terraform-provider-pritunl/errortypes"
+	"github.com/kihahu/terraform-provider-pritunl/schemas"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -111,7 +112,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	}
 
 	if respVal != nil {
-		err = json.NewDecoder(resp.Body).Decode(respVal)
+		info, _ := ioutil.ReadAll(resp.Body)
+		err = json.Unmarshal(info, &respVal)
 		if err != nil {
 			err = &errortypes.ParseError{
 				errors.Wrap(err, "request: Failed to parse response"),
