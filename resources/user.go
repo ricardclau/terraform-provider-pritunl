@@ -5,9 +5,9 @@ import (
 
 	"github.com/dropbox/godropbox/errors"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
-	"github.com/pritunl/terraform-provider-pritunl/request"
-	"github.com/pritunl/terraform-provider-pritunl/schemas"
+	"github.com/kihahu/terraform-provider-pritunl/errortypes"
+	"github.com/kihahu/terraform-provider-pritunl/request"
+	"github.com/kihahu/terraform-provider-pritunl/schemas"
 )
 
 func User() *schema.Resource {
@@ -132,9 +132,9 @@ func userGet(prvdr *schemas.Provider, sch *schemas.User) (
 		},
 	}
 
-	data = &userData{}
+	xdata := []userData{}
 
-	resp, err := req.Do(prvdr, data)
+	resp, err := req.Do(prvdr, xdata)
 	if err != nil {
 		return
 	}
@@ -167,9 +167,9 @@ func userPut(prvdr *schemas.Provider, sch *schemas.User) (
 		},
 	}
 
-	data = &userData{}
+	xdata := []userData{}
 
-	resp, err := req.Do(prvdr, data)
+	resp, err := req.Do(prvdr, xdata)
 	if err != nil {
 		return
 	}
@@ -202,9 +202,9 @@ func userPost(prvdr *schemas.Provider, sch *schemas.User) (
 		},
 	}
 
-	data = &userData{}
+	xdata := []userData{}
 
-	resp, err := req.Do(prvdr, data)
+	resp, err := req.Do(prvdr, xdata)
 	if err != nil {
 		return
 	}

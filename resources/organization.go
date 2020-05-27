@@ -84,7 +84,7 @@ func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
 		},
 	}
 
-	xdata := []organizationData{}
+	xdata := &organizationData{}
 
 	resp, err := req.Do(prvdr, xdata)
 	if err != nil {

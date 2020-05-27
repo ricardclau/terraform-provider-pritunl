@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"io"
@@ -61,6 +62,11 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 		}
 
 		body = bytes.NewBuffer(data)
+	}
+
+	// Disable SSL Check for local testing
+	if prvdr.PritunlHost == "localhost" {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
 	req, err := http.NewRequest(r.Method, url, body)
