@@ -105,7 +105,7 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 404 {
+	if resp.StatusCode == 404 || resp.StatusCode == 401 {
 		return
 	}
 

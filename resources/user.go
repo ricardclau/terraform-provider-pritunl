@@ -275,7 +275,7 @@ func userUpdate(d *schema.ResourceData, m interface{}) (err error) {
 	}
 
 	if data == nil {
-		d.SetId("")
+		// d.SetId("")
 		return
 	}
 
@@ -294,7 +294,7 @@ func userRead(d *schema.ResourceData, m interface{}) (err error) {
 	}
 
 	if data == nil {
-		d.SetId("")
+		// d.SetId("")
 		return
 	}
 

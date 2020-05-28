@@ -10,15 +10,15 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		ConfigureFunc: providerConfigure,
 		Schema: map[string]*schema.Schema{
-			"pritunl_host": &schema.Schema{
+			"pritunl_host": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"pritunl_token": &schema.Schema{
+			"pritunl_token": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"pritunl_secret": &schema.Schema{
+			"pritunl_secret": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -29,6 +29,7 @@ func Provider() *schema.Provider {
 			"pritunl_link":          resources.Link(),
 			"pritunl_link_location": resources.LinkLocation(),
 			"pritunl_link_host":     resources.LinkHost(),
+			"pritunl_server":        resources.Server(),
 		},
 	}
 }

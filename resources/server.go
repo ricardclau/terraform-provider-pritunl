@@ -10,12 +10,12 @@ import (
 	"github.com/kihahu/terraform-provider-pritunl/schemas"
 )
 
-func Organization() *schema.Resource {
+func Server() *schema.Resource {
 	return &schema.Resource{
-		Create: organizationCreate,
-		Read:   organizationRead,
-		Update: organizationUpdate,
-		Delete: organizationDelete,
+		Create: serverCreate,
+		Read:   serverRead,
+		Update: serverUpdate,
+		Delete: serverDelete,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -25,25 +25,25 @@ func Organization() *schema.Resource {
 	}
 }
 
-type organizationPostData struct {
+type serverPostData struct {
 	Name string `json:"name"`
 }
 
-type organizationPutData struct {
+type serverPutData struct {
 	Name string `json:"name"`
 }
 
-type organizationData struct {
+type serverData struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
-func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (
-	data *organizationData, err error) {
+func serverGet(prvdr *schemas.Provider, sch *schemas.Server) (
+	data *serverData, err error) {
 
 	req := request.Request{
 		Method: "GET",
-		Path:   fmt.Sprintf("/organization/%s", sch.Id),
+		Path:   fmt.Sprintf("/server/%s", sch.Id),
 	}
 
 	resp, err := req.Do(prvdr, data)
@@ -58,18 +58,18 @@ func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (
 	return
 }
 
-func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
-	data *organizationData, err error) {
+func serverPut(prvdr *schemas.Provider, sch *schemas.Server) (
+	data *serverData, err error) {
 
 	req := request.Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/organization/%s", sch.Id),
-		Json: &organizationPutData{
+		Path:   fmt.Sprintf("/server/%s", sch.Id),
+		Json: &serverPutData{
 			Name: sch.Name,
 		},
 	}
 
-	data = &organizationData{}
+	data = &serverData{}
 
 	resp, err := req.Do(prvdr, data)
 	if err != nil {
@@ -83,18 +83,18 @@ func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
 	return
 }
 
-func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
-	data *organizationData, err error) {
+func serverPost(prvdr *schemas.Provider, sch *schemas.Server) (
+	data *serverData, err error) {
 
 	req := request.Request{
 		Method: "POST",
-		Path:   "/organization",
-		Json: &organizationPostData{
+		Path:   "/server",
+		Json: &serverPostData{
 			Name: sch.Name,
 		},
 	}
 
-	data = &organizationData{}
+	data = &serverData{}
 
 	resp, err := req.Do(prvdr, data)
 	if err != nil {
@@ -103,7 +103,7 @@ func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
 
 	if resp.StatusCode == 404 {
 		err = &errortypes.RequestError{
-			errors.New("organization: Not found on post"),
+			errors.New("server: Not found on post"),
 		}
 		return
 	}
@@ -111,12 +111,12 @@ func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
 	return
 }
 
-func organizationDel(prvdr *schemas.Provider, sch *schemas.Organization) (
+func serverDel(prvdr *schemas.Provider, sch *schemas.Server) (
 	err error) {
 
 	req := request.Request{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/organization/%s", sch.Id),
+		Path:   fmt.Sprintf("/server/%s", sch.Id),
 	}
 
 	_, err = req.Do(prvdr, nil)
@@ -128,11 +128,11 @@ func organizationDel(prvdr *schemas.Provider, sch *schemas.Organization) (
 	return
 }
 
-func organizationCreate(d *schema.ResourceData, m interface{}) (err error) {
+func serverCreate(d *schema.ResourceData, m interface{}) (err error) {
 	prvdr := m.(*schemas.Provider)
-	sch := schemas.LoadOrganization(d)
+	sch := schemas.LoadServer(d)
 
-	data, err := organizationGet(prvdr, sch)
+	data, err := serverGet(prvdr, sch)
 	if err != nil {
 		return
 	}
@@ -140,14 +140,14 @@ func organizationCreate(d *schema.ResourceData, m interface{}) (err error) {
 	if data != nil {
 		sch.Id = data.Id
 
-		data, err = organizationPut(prvdr, sch)
+		data, err = serverPut(prvdr, sch)
 		if err != nil {
 			return
 		}
 	}
 
 	if data == nil {
-		data, err = organizationPost(prvdr, sch)
+		data, err = serverPost(prvdr, sch)
 		if err != nil {
 			return
 		}
@@ -158,11 +158,11 @@ func organizationCreate(d *schema.ResourceData, m interface{}) (err error) {
 	return
 }
 
-func organizationUpdate(d *schema.ResourceData, m interface{}) (err error) {
+func serverUpdate(d *schema.ResourceData, m interface{}) (err error) {
 	prvdr := m.(*schemas.Provider)
-	sch := schemas.LoadOrganization(d)
+	sch := schemas.LoadServer(d)
 
-	data, err := organizationPut(prvdr, sch)
+	data, err := serverPut(prvdr, sch)
 	if err != nil {
 		return
 	}
@@ -177,11 +177,11 @@ func organizationUpdate(d *schema.ResourceData, m interface{}) (err error) {
 	return
 }
 
-func organizationRead(d *schema.ResourceData, m interface{}) (err error) {
+func serverRead(d *schema.ResourceData, m interface{}) (err error) {
 	prvdr := m.(*schemas.Provider)
-	sch := schemas.LoadOrganization(d)
+	sch := schemas.LoadServer(d)
 
-	data, err := organizationGet(prvdr, sch)
+	data, err := serverGet(prvdr, sch)
 	if err != nil {
 		return
 	}
@@ -196,11 +196,11 @@ func organizationRead(d *schema.ResourceData, m interface{}) (err error) {
 	return
 }
 
-func organizationDelete(d *schema.ResourceData, m interface{}) (err error) {
+func serverDelete(d *schema.ResourceData, m interface{}) (err error) {
 	prvdr := m.(*schemas.Provider)
-	sch := schemas.LoadOrganization(d)
+	sch := schemas.LoadServer(d)
 
-	err = organizationDel(prvdr, sch)
+	err = serverDel(prvdr, sch)
 	if err != nil {
 		return
 	}
