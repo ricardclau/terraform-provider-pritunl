@@ -24,12 +24,14 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"pritunl_organization":  resources.Organization(),
-			"pritunl_user":          resources.User(),
-			"pritunl_link":          resources.Link(),
-			"pritunl_link_location": resources.LinkLocation(),
-			"pritunl_link_host":     resources.LinkHost(),
-			"pritunl_server":        resources.Server(),
+			"pritunl_organization":             resources.Organization(),
+			"pritunl_user":                     resources.User(),
+			"pritunl_link":                     resources.Link(),
+			"pritunl_link_location":            resources.LinkLocation(),
+			"pritunl_link_host":                resources.LinkHost(),
+			"pritunl_server":                   resources.Server(),
+			"pritunl_route":                    resources.Route(),
+			"pritunl_link_server_organization": resources.LinkServerOrganization(),
 		},
 	}
 }

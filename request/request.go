@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -96,6 +97,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 		req.Header.Set("Content-Type", "application/json")
 	}
 
+	log.Printf("[DEBUG] Sending Request: %s", req)
+
 	resp, err = client.Do(req)
 	if err != nil {
 		err = &errortypes.RequestError{
@@ -120,6 +123,7 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	if respVal != nil {
 		info, _ := ioutil.ReadAll(resp.Body)
 		err = json.Unmarshal(info, &respVal)
+		log.Printf("[DEBUG] Sending Request: %s", respVal)
 		if err != nil {
 			err = &errortypes.ParseError{
 				errors.Wrap(err, "request: Failed to parse response"),
