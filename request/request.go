@@ -66,9 +66,9 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	}
 
 	// Disable SSL Check for local testing
-	if prvdr.PritunlHost == "localhost" {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	}
+	// if prvdr.PritunlHost == "localhost" {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	// }
 
 	req, err := http.NewRequest(r.Method, url, body)
 	if err != nil {
