@@ -2,7 +2,6 @@ package schemas
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/kihahu/terraform-provider-pritunl/utils"
 )
 
 type Server struct {
@@ -91,11 +90,11 @@ func LoadServer(d *schema.ResourceData) (sch *Server) {
 		Debug:            false,
 		RestrictRoutes:   true,
 		UserCount:        0,
-		Groups:           utils.ExpandStringList(d.Get("groups").(*schema.Set).List()),
-		InterClient:      true,
-		ReplicaCount:     1,
-		Cipher:           "aes128",
-		JumboFrames:      false,
+		// Groups:           utils.ExpandStringList(d.Get("groups").(*schema.Set).List()),
+		InterClient:  true,
+		ReplicaCount: 1,
+		Cipher:       "aes128",
+		JumboFrames:  false,
 	}
 
 	dnsServers := d.Get("dns_servers").([]interface{})
@@ -103,6 +102,14 @@ func LoadServer(d *schema.ResourceData) (sch *Server) {
 		sch.DNSServers = []string{}
 		for _, dnsServer := range dnsServers {
 			sch.DNSServers = append(sch.DNSServers, dnsServer.(string))
+		}
+	}
+
+	groups := d.Get("groups").([]interface{})
+	if groups != nil {
+		sch.Groups = []string{}
+		for _, group := range groups {
+			sch.Groups = append(sch.Groups, group.(string))
 		}
 	}
 

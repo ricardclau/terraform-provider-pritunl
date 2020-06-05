@@ -27,11 +27,11 @@ func Server() *schema.Resource {
 				Required: true,
 			},
 			"groups": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"dns_servers": {
 				Type:     schema.TypeList,
