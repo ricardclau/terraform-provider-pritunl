@@ -180,18 +180,7 @@ func linkServerOrganizationUpdate(d *schema.ResourceData, m interface{}) (err er
 }
 
 func linkServerOrganizationRead(d *schema.ResourceData, m interface{}) (err error) {
-	// prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadLinkServerOrganization(d)
-
-	// data, err := linkServerOrganizationGet(prvdr, sch)
-	// if err != nil {
-	// 	return
-	// }
-
-	// if data == nil {
-	// 	return
-	// }
-
 	d.Set("server", sch.Server)
 	d.Set("organization_id", sch.OrganizationId)
 	d.SetId(sch.Id)

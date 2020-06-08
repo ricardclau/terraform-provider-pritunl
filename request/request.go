@@ -123,7 +123,13 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	if respVal != nil {
 		info, _ := ioutil.ReadAll(resp.Body)
 		err = json.Unmarshal(info, &respVal)
-		log.Printf("[DEBUG] Sending Request: %s", respVal)
+		log.Printf("[DEBUG] Returned Request: %s", respVal)
+		// if r.Path == "/settings" {
+		// 	var settingsResp *schemas.Settings
+		// 	mapstructure.Decode(respVal, &settingsResp)
+		// 	log.Printf("[DEBUG] Returned Response settings: %s", settingsResp)
+		// 	return
+		// }
 		if err != nil {
 			err = &errortypes.ParseError{
 				errors.Wrap(err, "request: Failed to parse response"),

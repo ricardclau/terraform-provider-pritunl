@@ -28,7 +28,6 @@ func LoadRoute(d *schema.ResourceData) (sch *Route) {
 		Id:      d.Id(),
 		Server:  d.Get("server").(string),
 		Network: d.Get("network").(string),
-		Comment: d.Get("comment").(string),
 	}
 
 	return

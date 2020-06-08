@@ -112,7 +112,7 @@ func serverGet(prvdr *schemas.Provider, sch *schemas.Server) (
 		return
 	}
 
-	if resp.StatusCode < 405 {
+	if resp.StatusCode == 400 || resp.StatusCode == 400 {
 		data = nil
 	}
 

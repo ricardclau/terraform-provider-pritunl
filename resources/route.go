@@ -26,10 +26,6 @@ func Route() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"comment": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
 		},
 	}
 }
@@ -83,6 +79,7 @@ func routePut(prvdr *schemas.Provider, sch *schemas.Route) (
 			Server:  sch.Server,
 			Network: sch.Network,
 			Comment: sch.Comment,
+			Id:      sch.Id,
 		},
 	}
 
@@ -110,6 +107,7 @@ func routePost(prvdr *schemas.Provider, sch *schemas.Route) (
 			Server:  sch.Server,
 			Network: sch.Network,
 			Comment: sch.Comment,
+			Id:      sch.Id,
 		},
 	}
 
@@ -156,23 +154,25 @@ func routeCreate(d *schema.ResourceData, m interface{}) (err error) {
 		return
 	}
 
-	if data != nil {
-		sch.Id = data.Id
+	// if data != nil {
+	// 	sch.Id = data.Id
 
-		data, err = routePut(prvdr, sch)
-		if err != nil {
-			return
-		}
+	// 	data, err = routePut(prvdr, sch)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
+
+	// if data == nil {
+	data, err = routePost(prvdr, sch)
+	if err != nil {
+		return
 	}
+	// }
 
-	if data == nil {
-		data, err = routePost(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	d.SetId(data.Id)
+	// d.SetId(data.Id)
+	d.Set("server", data.Server)
+	d.SetId(data.Network)
 
 	return
 }
@@ -181,17 +181,18 @@ func routeUpdate(d *schema.ResourceData, m interface{}) (err error) {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadRoute(d)
 
-	data, err := routePut(prvdr, sch)
+	data, err := routePost(prvdr, sch)
 	if err != nil {
 		return
 	}
 
 	if data == nil {
-		// d.SetId("")
 		return
 	}
 
-	d.SetId(data.Id)
+	// d.SetId(data.Id)
+	d.Set("server", data.Server)
+	d.SetId(data.Network)
 
 	return
 }
@@ -210,8 +211,8 @@ func routeRead(d *schema.ResourceData, m interface{}) (err error) {
 	}
 
 	d.Set("server", data.Server)
-	d.Set("network", data.Network)
-	d.SetId(data.Id)
+	d.SetId(data.Network)
+	// d.SetId(data.Id)
 
 	return
 }

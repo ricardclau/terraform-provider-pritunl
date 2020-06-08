@@ -32,6 +32,8 @@ func Provider() *schema.Provider {
 			"pritunl_server":                   resources.Server(),
 			"pritunl_route":                    resources.Route(),
 			"pritunl_link_server_organization": resources.LinkServerOrganization(),
+			"pritunl_settings":                 resources.Settings(),
+			"pritunl_server_start":             resources.ServerStart(),
 		},
 	}
 }
