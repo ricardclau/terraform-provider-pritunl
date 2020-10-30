@@ -1,10 +1,9 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
-	"github.com/dropbox/godropbox/errors"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
@@ -88,12 +87,11 @@ type linkHostData struct {
 	Uri           string `json:"uri"`
 }
 
-func linkHostGet(prvdr *schemas.Provider, sch *schemas.LinkHost) (
-	data *linkHostData, err error) {
+func linkHostGet(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHostData, err error) {
 
 	req := request.Request{
 		Method: "GET",
-		Path:   fmt.Sprintf("/tf/link/%s/host", sch.LocationId),
+		Path:   fmt.Sprintf("/link/%s/host", sch.LocationId),
 		Query: map[string]string{
 			"id":   sch.Id,
 			"name": sch.Name,
@@ -145,8 +143,7 @@ func linkHostPut(prvdr *schemas.Provider, sch *schemas.LinkHost) (
 	return
 }
 
-func linkHostPost(prvdr *schemas.Provider, sch *schemas.LinkHost) (
-	data *linkHostData, err error) {
+func linkHostPost(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHostData, err error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -170,21 +167,19 @@ func linkHostPost(prvdr *schemas.Provider, sch *schemas.LinkHost) (
 	}
 
 	if resp.StatusCode == 404 {
-		err = &errortypes.RequestError{
-			errors.New("linkHost: Not found on post"),
-		}
+		err = errors.New("linkHost: Not found on post")
+
 		return
 	}
 
 	return
 }
 
-func linkHostDel(prvdr *schemas.Provider, sch *schemas.LinkHost) (
-	err error) {
+func linkHostDel(prvdr *schemas.Provider, sch *schemas.LinkHost) (err error) {
 
 	req := request.Request{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/tf/link/%s/host/%s", sch.LocationId, sch.Id),
+		Path:   fmt.Sprintf("/link/%s/host/%s", sch.LocationId, sch.Id),
 	}
 
 	_, err = req.Do(prvdr, nil)
@@ -231,17 +226,17 @@ func linkHostUpdate(d *schema.ResourceData, m interface{}) (err error) {
 
 	data, err := linkHostPut(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
 		d.SetId("")
-		return
+		return nil
 	}
 
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
 func linkHostRead(d *schema.ResourceData, m interface{}) (err error) {
@@ -250,15 +245,13 @@ func linkHostRead(d *schema.ResourceData, m interface{}) (err error) {
 
 	data, err := linkHostGet(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
 		d.SetId("")
-		return
+		return nil
 	}
-
-
 
 	d.Set("name", data.Name)
 	d.Set("timeout", data.Timeout)
@@ -267,10 +260,10 @@ func linkHostRead(d *schema.ResourceData, m interface{}) (err error) {
 	d.Set("public_address", data.PublicAddress)
 	d.Set("local_address", data.LocalAddress)
 	d.Set("address6", data.Address6)
-	d.Set("uri", data.Uri + prvdr.PritunlHost)
+	d.Set("uri", data.Uri+prvdr.PritunlHost)
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
 func linkHostDelete(d *schema.ResourceData, m interface{}) (err error) {

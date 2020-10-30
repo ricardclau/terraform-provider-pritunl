@@ -1,9 +1,9 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/kihahu/terraform-provider-pritunl/resources"
-	"github.com/kihahu/terraform-provider-pritunl/schemas"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/pritunl/terraform-provider-pritunl/resources"
+	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
 func Provider() *schema.Provider {

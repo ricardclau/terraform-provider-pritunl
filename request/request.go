@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,9 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dropbox/godropbox/errors"
-	"github.com/kihahu/terraform-provider-pritunl/errortypes"
-	"github.com/kihahu/terraform-provider-pritunl/schemas"
+	"github.com/pritunl/terraform-provider-pritunl/schemas"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -32,8 +31,7 @@ type Request struct {
 	Json   interface{}
 }
 
-func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
-	resp *http.Response, err error) {
+func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (resp *http.Response, err error) {
 
 	url := "https://" + prvdr.PritunlHost + r.Path
 
@@ -56,9 +54,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	if r.Json != nil {
 		data, e := json.Marshal(r.Json)
 		if e != nil {
-			err = errortypes.RequestError{
-				errors.Wrap(e, "request: Json marshal error"),
-			}
+			err = fmt.Errorf("request: Json marshal error: %v", e)
+
 			return
 		}
 
@@ -72,9 +69,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 
 	req, err := http.NewRequest(r.Method, url, body)
 	if err != nil {
-		err = &errortypes.RequestError{
-			errors.Wrap(err, "request: Failed to create request"),
-		}
+		err = fmt.Errorf("request: Failed to create request: %v", err)
+
 		return
 	}
 
@@ -101,9 +97,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 
 	resp, err = client.Do(req)
 	if err != nil {
-		err = &errortypes.RequestError{
-			errors.Wrap(err, "request: Request error"),
-		}
+		err = fmt.Errorf("request: Request error: %v", err)
+
 		return
 	}
 	defer resp.Body.Close()
@@ -113,10 +108,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		err = &errortypes.RequestError{
-			errors.Wrapf(err, "request: Bad response status %d",
-				resp.StatusCode),
-		}
+		err = fmt.Errorf("request: Bad response status %d", resp.StatusCode)
+
 		return
 	}
 
@@ -131,9 +124,8 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (
 		// 	return
 		// }
 		if err != nil {
-			err = &errortypes.ParseError{
-				errors.Wrap(err, "request: Failed to parse response"),
-			}
+			err = fmt.Errorf("request: Failed to parse response, %v", err)
+
 			return
 		}
 	}

@@ -1,6 +1,6 @@
 package schemas
 
-import "github.com/hashicorp/terraform/helper/schema"
+import "github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 type Settings struct {
 	SsoOneloginSecret     interface{} `json:"sso_onelogin_secret"`

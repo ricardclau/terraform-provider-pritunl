@@ -1,10 +1,9 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
-	"github.com/dropbox/godropbox/errors"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
@@ -104,7 +103,7 @@ func linkPost(prvdr *schemas.Provider, sch *schemas.Link) (
 
 	req := request.Request{
 		Method: "POST",
-		Path:   "/tf/link",
+		Path:   "/link",
 		Json: &linkPostData{
 			Name: sch.Name,
 			Ipv6: sch.Ipv6,
@@ -119,9 +118,8 @@ func linkPost(prvdr *schemas.Provider, sch *schemas.Link) (
 	}
 
 	if resp.StatusCode == 404 {
-		err = &errortypes.RequestError{
-			errors.New("link: Not found on post"),
-		}
+		err = errors.New("link: Not found on post")
+
 		return
 	}
 
@@ -133,7 +131,7 @@ func linkDel(prvdr *schemas.Provider, sch *schemas.Link) (
 
 	req := request.Request{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/tf/link/%s", sch.Id),
+		Path:   fmt.Sprintf("/link/%s", sch.Id),
 	}
 
 	_, err = req.Do(prvdr, nil)

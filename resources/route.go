@@ -3,11 +3,10 @@ package resources
 import (
 	"fmt"
 
-	"github.com/dropbox/godropbox/errors"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/kihahu/terraform-provider-pritunl/errortypes"
-	"github.com/kihahu/terraform-provider-pritunl/request"
-	"github.com/kihahu/terraform-provider-pritunl/schemas"
+	"errors"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/pritunl/terraform-provider-pritunl/request"
+	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
 func Route() *schema.Resource {
@@ -119,9 +118,8 @@ func routePost(prvdr *schemas.Provider, sch *schemas.Route) (
 	}
 
 	if resp.StatusCode == 404 {
-		err = &errortypes.RequestError{
-			errors.New("server: Not found on post"),
-		}
+		err = errors.New("server: Not found on post")
+
 		return
 	}
 

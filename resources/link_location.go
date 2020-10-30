@@ -1,10 +1,9 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
-	"github.com/dropbox/godropbox/errors"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/errortypes"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
@@ -46,7 +45,7 @@ func linkLocationGet(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 
 	req := request.Request{
 		Method: "GET",
-		Path:   fmt.Sprintf("/tf/link/%s/location", sch.LinkId),
+		Path:   fmt.Sprintf("/link/%s/location", sch.LinkId),
 		Query: map[string]string{
 			"id":   sch.Id,
 			"name": sch.Name,
@@ -72,7 +71,7 @@ func linkLocationPut(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 
 	req := request.Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/tf/link/%s/location/%s", sch.LinkId, sch.Id),
+		Path:   fmt.Sprintf("/link/%s/location/%s", sch.LinkId, sch.Id),
 		Json: &linkLocationPutData{
 			Name: sch.Name,
 		},
@@ -97,7 +96,7 @@ func linkLocationPost(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 
 	req := request.Request{
 		Method: "POST",
-		Path:   fmt.Sprintf("/tf/link/%s/location", sch.LinkId),
+		Path:   fmt.Sprintf("/link/%s/location", sch.LinkId),
 		Json: &linkLocationPostData{
 			Name: sch.Name,
 		},
@@ -111,9 +110,8 @@ func linkLocationPost(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 	}
 
 	if resp.StatusCode == 404 {
-		err = &errortypes.RequestError{
-			errors.New("linkLocation: Not found on post"),
-		}
+		err = errors.New("linkLocation: Not found on post")
+
 		return
 	}
 

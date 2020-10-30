@@ -1,13 +1,12 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/dropbox/godropbox/errors"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/kihahu/terraform-provider-pritunl/errortypes"
-	"github.com/kihahu/terraform-provider-pritunl/request"
-	"github.com/kihahu/terraform-provider-pritunl/schemas"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/pritunl/terraform-provider-pritunl/request"
+	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
 func Settings() *schema.Resource {
@@ -111,8 +110,7 @@ func settingsPut(prvdr *schemas.Provider, sch *schemas.Settings) (
 	return xdata, err
 }
 
-func settingPost(prvdr *schemas.Provider, sch *schemas.Settings) (
-	data *schemas.Settings, err error) {
+func settingPost(prvdr *schemas.Provider, sch *schemas.Settings) (data *schemas.Settings, err error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -126,25 +124,24 @@ func settingPost(prvdr *schemas.Provider, sch *schemas.Settings) (
 			ID:             sch.ID,
 		},
 	}
-	xdata := &schemas.Settings{}
 
-	resp, err := req.Do(prvdr, xdata)
+	data = &schemas.Settings{}
+
+	resp, err := req.Do(prvdr, data)
 	if err != nil {
 		return
 	}
 
 	if resp.StatusCode == 404 {
-		err = &errortypes.RequestError{
-			errors.New("server: Not found on post"),
-		}
+		err = errors.New("server: Not found on post")
+
 		return
 	}
 
 	return
 }
 
-func settingDel(prvdr *schemas.Provider, sch *schemas.Settings) (
-	err error) {
+func settingDel(prvdr *schemas.Provider, sch *schemas.Settings) (err error) {
 	return
 }
 

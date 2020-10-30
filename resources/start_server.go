@@ -3,9 +3,9 @@ package resources
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/kihahu/terraform-provider-pritunl/request"
-	"github.com/kihahu/terraform-provider-pritunl/schemas"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/pritunl/terraform-provider-pritunl/request"
+	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
 func ServerStart() *schema.Resource {
