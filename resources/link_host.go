@@ -117,7 +117,7 @@ func linkHostPut(prvdr *schemas.Provider, sch *schemas.LinkHost) (
 
 	req := request.Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/tf/link/%s/host/%s", sch.LocationId, sch.Id),
+		Path:   fmt.Sprintf("/link/%s/host/%s", sch.LocationId, sch.Id),
 		Json: &linkHostPutData{
 			Name:          sch.Name,
 			Timeout:       sch.Timeout,
@@ -147,7 +147,7 @@ func linkHostPost(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHos
 
 	req := request.Request{
 		Method: "POST",
-		Path:   fmt.Sprintf("/tf/link/%s/host", sch.LocationId),
+		Path:   fmt.Sprintf("/link/%s/host", sch.LocationId),
 		Json: &linkHostPostData{
 			Name:          sch.Name,
 			Timeout:       sch.Timeout,

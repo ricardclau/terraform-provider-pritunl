@@ -123,7 +123,7 @@ func linkLocationDel(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 
 	req := request.Request{
 		Method: "DELETE",
-		Path:   fmt.Sprintf("/tf/link/%s/location/%s", sch.LinkId, sch.Id),
+		Path:   fmt.Sprintf("/link/%s/location/%s", sch.LinkId, sch.Id),
 	}
 
 	_, err = req.Do(prvdr, nil)

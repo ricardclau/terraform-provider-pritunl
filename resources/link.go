@@ -51,7 +51,7 @@ func linkGet(prvdr *schemas.Provider, sch *schemas.Link) (
 
 	req := request.Request{
 		Method: "GET",
-		Path:   "/tf/link",
+		Path:   "/link",
 		Query: map[string]string{
 			"id":   sch.Id,
 			"name": sch.Name,
@@ -77,7 +77,7 @@ func linkPut(prvdr *schemas.Provider, sch *schemas.Link) (
 
 	req := request.Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/tf/link/%s", sch.Id),
+		Path:   fmt.Sprintf("/link/%s", sch.Id),
 		Json: &linkPutData{
 			Name: sch.Name,
 			Ipv6: sch.Ipv6,
