@@ -1,9 +1,9 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
 
-	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
@@ -37,28 +37,23 @@ type organizationData struct {
 	Name string `json:"name"`
 }
 
-func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (
-	data *organizationData, err error) {
+func organizationGet(prvdr *schemas.Provider, sch *schemas.Organization) (*organizationData, error) {
 
 	req := request.Request{
 		Method: "GET",
 		Path:   fmt.Sprintf("/organization/%s", sch.Id),
 	}
 
-	resp, err := req.Do(prvdr, data)
+	data := &organizationData{}
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 || resp.StatusCode == 401 {
-		data = nil
-	}
-
-	return
+	return data, nil
 }
 
-func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
-	data *organizationData, err error) {
+func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (*organizationData, error) {
 
 	req := request.Request{
 		Method: "PUT",
@@ -68,22 +63,17 @@ func organizationPut(prvdr *schemas.Provider, sch *schemas.Organization) (
 		},
 	}
 
-	data = &organizationData{}
+	data := &organizationData{}
 
-	resp, err := req.Do(prvdr, data)
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		data = nil
-	}
-
-	return
+	return data, nil
 }
 
-func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
-	data *organizationData, err error) {
+func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (*organizationData, error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -93,117 +83,94 @@ func organizationPost(prvdr *schemas.Provider, sch *schemas.Organization) (
 		},
 	}
 
-	data = &organizationData{}
+	data := &organizationData{}
 
-	resp, err := req.Do(prvdr, data)
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		err = errors.New("organization: Not found on post")
-
-		return
-	}
-
-	return
+	return data, nil
 }
 
-func organizationDel(prvdr *schemas.Provider, sch *schemas.Organization) (
-	err error) {
+func organizationDel(prvdr *schemas.Provider, sch *schemas.Organization) error {
 
 	req := request.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/organization/%s", sch.Id),
 	}
 
-	_, err = req.Do(prvdr, nil)
+	_, err := req.Do(prvdr, nil)
 
 	if err != nil {
-		return
+		return err
 	}
 
-	return
+	return nil
 }
 
-func organizationCreate(d *schema.ResourceData, m interface{}) (err error) {
+func organizationCreate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadOrganization(d)
 
-	data, err := organizationGet(prvdr, sch)
+	data, err := organizationPost(prvdr, sch)
 	if err != nil {
-		return
-	}
-
-	if data != nil {
-		sch.Id = data.Id
-
-		data, err = organizationPut(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	if data == nil {
-		data, err = organizationPost(prvdr, sch)
-		if err != nil {
-			return
-		}
+		return err
 	}
 
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func organizationUpdate(d *schema.ResourceData, m interface{}) (err error) {
+func organizationUpdate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadOrganization(d)
 
 	data, err := organizationPut(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
 		d.SetId("")
-		return
+		return nil
 	}
 
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func organizationRead(d *schema.ResourceData, m interface{}) (err error) {
+func organizationRead(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadOrganization(d)
 
 	data, err := organizationGet(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
-		return
+		return errors.New(fmt.Sprintf("Cannot Read Organization %v", d.Id()))
 	}
 
 	d.Set("name", data.Name)
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func organizationDelete(d *schema.ResourceData, m interface{}) (err error) {
+func organizationDelete(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadOrganization(d)
 
-	err = organizationDel(prvdr, sch)
+	err := organizationDel(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	d.SetId("")
 
-	return
+	return nil
 }

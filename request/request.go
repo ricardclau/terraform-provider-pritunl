@@ -21,7 +21,7 @@ import (
 )
 
 var client = &http.Client{
-	Timeout: 2 * time.Minute,
+	Timeout: 10 * time.Second,
 }
 
 type Request struct {
@@ -31,7 +31,7 @@ type Request struct {
 	Json   interface{}
 }
 
-func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (resp *http.Response, err error) {
+func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (*http.Response, error) {
 
 	url := "https://" + prvdr.PritunlHost + r.Path
 
@@ -54,9 +54,9 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (resp *http.R
 	if r.Json != nil {
 		data, e := json.Marshal(r.Json)
 		if e != nil {
-			err = fmt.Errorf("request: Json marshal error: %v", e)
+			err := fmt.Errorf("request: Json marshal error: %v", e)
 
-			return
+			return nil, err
 		}
 
 		body = bytes.NewBuffer(data)
@@ -71,7 +71,7 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (resp *http.R
 	if err != nil {
 		err = fmt.Errorf("request: Failed to create request: %v", err)
 
-		return
+		return nil, err
 	}
 
 	if r.Query != nil {
@@ -93,30 +93,24 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (resp *http.R
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	log.Printf("[DEBUG] Sending Request: %s", req)
+	log.Println(fmt.Sprintf("[DEBUG] Sending Request: %s", req))
 
-	resp, err = client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
-		err = fmt.Errorf("request: Request error: %v", err)
-
-		return
+		return nil, fmt.Errorf("request: Request error: %v", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 404 || resp.StatusCode == 401 {
-		return
-	}
-
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		err = fmt.Errorf("request: Bad response status %d", resp.StatusCode)
-
-		return
+		return nil, fmt.Errorf("request: Bad response status %d for req: %v", resp.StatusCode, req)
 	}
+
+	info, _ := ioutil.ReadAll(resp.Body)
+	log.Println(fmt.Sprintf("[DEBUG] Response Status: %v Body: %s", resp.StatusCode, info))
 
 	if respVal != nil {
-		info, _ := ioutil.ReadAll(resp.Body)
 		err = json.Unmarshal(info, &respVal)
-		log.Printf("[DEBUG] Returned Request: %s", respVal)
+		//log.Printf("[DEBUG] Returned Request: %s", respVal)
 		// if r.Path == "/settings" {
 		// 	var settingsResp *schemas.Settings
 		// 	mapstructure.Decode(respVal, &settingsResp)
@@ -124,11 +118,9 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (resp *http.R
 		// 	return
 		// }
 		if err != nil {
-			err = fmt.Errorf("request: Failed to parse response, %v", err)
-
-			return
+			return nil, fmt.Errorf("request: Failed to parse response, %v, Body: %s", err, info)
 		}
 	}
 
-	return
+	return resp, nil
 }

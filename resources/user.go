@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+	"log"
 
 	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -81,28 +82,28 @@ type userPostData struct {
 	Name            string   `json:"name"`
 	Email           string   `json:"email"`
 	AuthType        string   `json:"auth_type"`
-	Groups          []string `json:"groups"`
+	Groups          []string `json:"groups,omitempty"`
 	Pin             string   `json:"pin"`
 	Disabled        bool     `json:"disabled"`
-	NetworkLinks    []string `json:"network_links"`
+	NetworkLinks    []string `json:"network_links,omitempty"`
 	BypassSecondary bool     `json:"bypass_secondary"`
 	ClientToClient  bool     `json:"client_to_client"`
-	DnsServers      []string `json:"dns_servers"`
-	DnsSuffix       string   `json:"dns_suffix"`
+	DnsServers      []string `json:"dns_servers,omitempty"`
+	DnsSuffix       string   `json:"dns_suffix,omitempty"`
 }
 
 type userPutData struct {
 	Name            string   `json:"name"`
 	Email           string   `json:"email"`
 	AuthType        string   `json:"auth_type"`
-	Groups          []string `json:"groups"`
+	Groups          []string `json:"groups,omitempty"`
 	Pin             string   `json:"pin"`
 	Disabled        bool     `json:"disabled"`
-	NetworkLinks    []string `json:"network_links"`
+	NetworkLinks    []string `json:"network_links,omitempty"`
 	BypassSecondary bool     `json:"bypass_secondary"`
 	ClientToClient  bool     `json:"client_to_client"`
-	DnsServers      []string `json:"dns_servers"`
-	DnsSuffix       string   `json:"dns_suffix"`
+	DnsServers      []string `json:"dns_servers,omitempty"`
+	DnsSuffix       string   `json:"dns_suffix,omitempty"`
 }
 
 type userData struct {
@@ -110,43 +111,32 @@ type userData struct {
 	Name            string   `json:"name"`
 	Email           string   `json:"email"`
 	AuthType        string   `json:"auth_type"`
-	Groups          []string `json:"groups"`
+	Groups          []string `json:"groups,omitempty"`
 	Disabled        bool     `json:"disabled"`
-	NetworkLinks    []string `json:"network_links"`
+	NetworkLinks    []string `json:"network_links,omitempty"`
 	BypassSecondary bool     `json:"bypass_secondary"`
 	ClientToClient  bool     `json:"client_to_client"`
-	DnsServers      []string `json:"dns_servers"`
-	DnsSuffix       string   `json:"dns_suffix"`
+	DnsServers      []string `json:"dns_servers,omitempty"`
+	DnsSuffix       string   `json:"dns_suffix,omitempty"`
 }
 
-func userGet(prvdr *schemas.Provider, sch *schemas.User) (
-	data *userData, err error) {
+func userGet(prvdr *schemas.Provider, sch *schemas.User) (*userData, error) {
 
 	req := request.Request{
 		Method: "GET",
-		Path:   fmt.Sprintf("/user/%s", sch.OrganizationId),
-		Query: map[string]string{
-			"id":   sch.Id,
-			"name": sch.Name,
-		},
+		Path:   fmt.Sprintf("/user/%s/%s", sch.OrganizationId, sch.Id),
 	}
 
-	xdata := []userData{}
-
-	resp, err := req.Do(prvdr, xdata)
+	data := &userData{}
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		data = nil
-	}
-
-	return
+	return data, nil
 }
 
-func userPut(prvdr *schemas.Provider, sch *schemas.User) (
-	data *userData, err error) {
+func userPut(prvdr *schemas.Provider, sch *schemas.User) (*userData, error) {
 
 	req := request.Request{
 		Method: "PUT",
@@ -166,22 +156,17 @@ func userPut(prvdr *schemas.Provider, sch *schemas.User) (
 		},
 	}
 
-	xdata := []userData{}
+	data := &userData{}
 
-	resp, err := req.Do(prvdr, xdata)
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		data = nil
-	}
-
-	return
+	return data, nil
 }
 
-func userPost(prvdr *schemas.Provider, sch *schemas.User) (
-	data *userData, err error) {
+func userPost(prvdr *schemas.Provider, sch *schemas.User) (*userData, error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -201,99 +186,80 @@ func userPost(prvdr *schemas.Provider, sch *schemas.User) (
 		},
 	}
 
-	xdata := []userData{}
+	data := []userData{}
 
-	resp, err := req.Do(prvdr, xdata)
+	_, err := req.Do(prvdr, &data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		err = errors.New("user: Not found on post")
-
-		return
-	}
-
-	return
+	ret := data[0]
+	return &ret, nil
 }
 
-func userDel(prvdr *schemas.Provider, sch *schemas.User) (
-	err error) {
+func userDel(prvdr *schemas.Provider, sch *schemas.User) error {
 
 	req := request.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/user/%s/%s", sch.OrganizationId, sch.Id),
 	}
 
-	_, err = req.Do(prvdr, nil)
+	_, err := req.Do(prvdr, nil)
 	if err != nil {
-		return
+		return err
 	}
 
-	return
+	return nil
 }
 
-func userCreate(d *schema.ResourceData, m interface{}) (err error) {
+func userCreate(d *schema.ResourceData, m interface{}) error {
+	log.Printf("[DEBUG] Inside userCreate: %s", d)
+
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadUser(d)
 
-	data, err := userGet(prvdr, sch)
+	log.Printf("[DEBUG] Before userPost: %s", d)
+	data, err := userPost(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
-	if data != nil {
-		sch.Id = data.Id
-
-		data, err = userPut(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	if data == nil {
-		data, err = userPost(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
+	log.Printf("[DEBUG] Before setting data: %s", data)
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func userUpdate(d *schema.ResourceData, m interface{}) (err error) {
+func userUpdate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadUser(d)
 
 	data, err := userPut(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
-		// d.SetId("")
-		return
+		d.SetId("")
+		return nil
 	}
 
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func userRead(d *schema.ResourceData, m interface{}) (err error) {
+func userRead(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadUser(d)
 
 	data, err := userGet(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
-		// d.SetId("")
-		return
+		return errors.New(fmt.Sprintf("Cannot Read User %v", d.Id()))
 	}
 
 	d.Set("name", data.Name)
@@ -308,19 +274,19 @@ func userRead(d *schema.ResourceData, m interface{}) (err error) {
 	d.Set("dns_suffix", data.DnsSuffix)
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func userDelete(d *schema.ResourceData, m interface{}) (err error) {
+func userDelete(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadUser(d)
 
-	err = userDel(prvdr, sch)
+	err := userDel(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	d.SetId("")
 
-	return
+	return nil
 }
