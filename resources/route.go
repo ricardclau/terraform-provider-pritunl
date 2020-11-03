@@ -3,7 +3,6 @@ package resources
 import (
 	"fmt"
 
-	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
@@ -48,28 +47,23 @@ type routeData struct {
 	VpcID          interface{} `json:"vpc_id"`
 }
 
-func routeGet(prvdr *schemas.Provider, sch *schemas.Route) (
-	data *routeData, err error) {
+func routeGet(prvdr *schemas.Provider, sch *schemas.Route) (*routeData, error) {
 
 	req := request.Request{
 		Method: "GET",
 		Path:   fmt.Sprintf("/server/%s/route/%s", sch.Server, sch.Id),
 	}
 
-	resp, err := req.Do(prvdr, data)
+	data := &routeData{}
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode < 405 {
-		data = nil
-	}
-
-	return
+	return data, nil
 }
 
-func routePut(prvdr *schemas.Provider, sch *schemas.Route) (
-	data *routeData, err error) {
+func routePut(prvdr *schemas.Provider, sch *schemas.Route) (*routeData, error) {
 
 	req := request.Request{
 		Method: "PUT",
@@ -82,22 +76,17 @@ func routePut(prvdr *schemas.Provider, sch *schemas.Route) (
 		},
 	}
 
-	data = &routeData{}
+	data := &routeData{}
 
-	resp, err := req.Do(prvdr, data)
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		data = nil
-	}
-
-	return
+	return data, nil
 }
 
-func routePost(prvdr *schemas.Provider, sch *schemas.Route) (
-	data *routeData, err error) {
+func routePost(prvdr *schemas.Provider, sch *schemas.Route) (*routeData, error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -110,46 +99,39 @@ func routePost(prvdr *schemas.Provider, sch *schemas.Route) (
 		},
 	}
 
-	data = &routeData{}
+	data := &routeData{}
 
-	resp, err := req.Do(prvdr, data)
+	_, err := req.Do(prvdr, data)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if resp.StatusCode == 404 {
-		err = errors.New("server: Not found on post")
-
-		return
-	}
-
-	return
+	return data, nil
 }
 
-func routeDel(prvdr *schemas.Provider, sch *schemas.Route) (
-	err error) {
+func routeDel(prvdr *schemas.Provider, sch *schemas.Route) error {
 
 	req := request.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/server/%s/route/%s", sch.Server, sch.Id),
 	}
 
-	_, err = req.Do(prvdr, nil)
+	_, err := req.Do(prvdr, nil)
 
 	if err != nil {
-		return
+		return err
 	}
 
-	return
+	return nil
 }
 
-func routeCreate(d *schema.ResourceData, m interface{}) (err error) {
+func routeCreate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadRoute(d)
 
 	data, err := routeGet(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	// if data != nil {
@@ -164,7 +146,7 @@ func routeCreate(d *schema.ResourceData, m interface{}) (err error) {
 	// if data == nil {
 	data, err = routePost(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 	// }
 
@@ -172,59 +154,59 @@ func routeCreate(d *schema.ResourceData, m interface{}) (err error) {
 	d.Set("server", data.Server)
 	d.SetId(data.Network)
 
-	return
+	return nil
 }
 
-func routeUpdate(d *schema.ResourceData, m interface{}) (err error) {
+func routeUpdate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadRoute(d)
 
 	data, err := routePost(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
-		return
+		return fmt.Errorf("Cannot update Route with id: %v", sch.Network)
 	}
 
 	// d.SetId(data.Id)
 	d.Set("server", data.Server)
 	d.SetId(data.Network)
 
-	return
+	return nil
 }
 
-func routeRead(d *schema.ResourceData, m interface{}) (err error) {
+func routeRead(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadRoute(d)
 
 	data, err := routeGet(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	if data == nil {
-		return
+		return fmt.Errorf("Cannot read Route with id: %v", sch.Network)
 	}
 
 	d.Set("server", data.Server)
 	d.SetId(data.Network)
 	// d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func routeDelete(d *schema.ResourceData, m interface{}) (err error) {
+func routeDelete(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadRoute(d)
 
-	err = routeDel(prvdr, sch)
+	err := routeDel(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	d.SetId("")
 
-	return
+	return nil
 }

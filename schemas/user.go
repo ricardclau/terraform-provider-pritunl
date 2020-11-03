@@ -20,8 +20,8 @@ type User struct {
 	DnsSuffix       string
 }
 
-func LoadUser(d *schema.ResourceData) (sch *User) {
-	sch = &User{
+func LoadUser(d *schema.ResourceData) *User {
+	sch := &User{
 		Id:              d.Id(),
 		OrganizationId:  d.Get("organization_id").(string),
 		Name:            d.Get("name").(string),
@@ -58,5 +58,5 @@ func LoadUser(d *schema.ResourceData) (sch *User) {
 		}
 	}
 
-	return
+	return sch
 }

@@ -3,7 +3,6 @@ package resources
 import (
 	"fmt"
 
-	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
@@ -12,9 +11,9 @@ import (
 // LinkServerOrganization Link server to orgaminzation
 func LinkServerOrganization() *schema.Resource {
 	return &schema.Resource{
-		Create: linkServerOrganizationCreate,
+		Create: linkServerOrganizationCreateOrUpdate,
 		Read:   linkServerOrganizationRead,
-		Update: linkServerOrganizationUpdate,
+		Update: linkServerOrganizationCreateOrUpdate,
 		Delete: linkServerOrganizationDelete,
 
 		Schema: map[string]*schema.Schema{
@@ -37,28 +36,20 @@ type linkServerOrganizationData struct {
 	Name           interface{} `json:"name"`
 }
 
-func linkServerOrganizationGet(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (
-	data *linkServerOrganizationData, err error) {
+func linkServerOrganizationGet(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (*linkServerOrganizationData, error) {
 
 	req := request.Request{
 		Method: "GET",
 		Path:   fmt.Sprintf("/server/%s/organization/%s", sch.Server, sch.OrganizationId),
 	}
 
-	resp, err := req.Do(prvdr, data)
-	if err != nil {
-		return
-	}
+	data := &linkServerOrganizationData{}
+	_, err := req.Do(prvdr, data)
 
-	if resp.StatusCode < 405 {
-		return
-	}
-
-	return
+	return data, err
 }
 
-func linkServerOrganizationPut(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (
-	data *linkServerOrganizationData, err error) {
+func linkServerOrganizationPut(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (*linkServerOrganizationData, error) {
 
 	req := request.Request{
 		Method: "PUT",
@@ -69,22 +60,13 @@ func linkServerOrganizationPut(prvdr *schemas.Provider, sch *schemas.LinkServerO
 		},
 	}
 
-	data = &linkServerOrganizationData{}
+	data := &linkServerOrganizationData{}
+	_, err := req.Do(prvdr, data)
 
-	resp, err := req.Do(prvdr, data)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode == 404 {
-		data = nil
-	}
-
-	return
+	return data, err
 }
 
-func linkServerOrganizationPost(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (
-	data *linkServerOrganizationData, err error) {
+func linkServerOrganizationPost(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (*linkServerOrganizationData, error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -95,107 +77,57 @@ func linkServerOrganizationPost(prvdr *schemas.Provider, sch *schemas.LinkServer
 		},
 	}
 
-	data = &linkServerOrganizationData{}
+	data := &linkServerOrganizationData{}
+	_, err := req.Do(prvdr, data)
 
-	resp, err := req.Do(prvdr, data)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode == 404 {
-		err = errors.New("server: Not found on post")
-
-		return
-	}
-
-	return
+	return data, err
 }
 
-func linkServerOrganizationDel(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) (
-	err error) {
+func linkServerOrganizationDel(prvdr *schemas.Provider, sch *schemas.LinkServerOrganization) error {
 
 	req := request.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/server/%s/organization/%s", sch.Server, sch.OrganizationId),
 	}
 
-	_, err = req.Do(prvdr, nil)
+	_, err := req.Do(prvdr, nil)
 
-	if err != nil {
-		return
-	}
-
-	return
+	return err
 }
 
-func linkServerOrganizationCreate(d *schema.ResourceData, m interface{}) (err error) {
-	prvdr := m.(*schemas.Provider)
-	sch := schemas.LoadLinkServerOrganization(d)
-
-	data, err := linkServerOrganizationGet(prvdr, sch)
-	if err != nil {
-		return
-	}
-
-	if data != nil {
-		sch.OrganizationId = data.Id
-
-		data, err = linkServerOrganizationPut(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	if data == nil {
-		data, err = linkServerOrganizationPut(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	d.SetId(data.Id)
-
-	return
-}
-
-func linkServerOrganizationUpdate(d *schema.ResourceData, m interface{}) (err error) {
+func linkServerOrganizationCreateOrUpdate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadLinkServerOrganization(d)
 
 	data, err := linkServerOrganizationPut(prvdr, sch)
 	if err != nil {
-		return
-	}
-
-	if data == nil {
-		// d.SetId("")
-		return
+		return err
 	}
 
 	d.SetId(data.Id)
 
-	return
+	return nil
 }
 
-func linkServerOrganizationRead(d *schema.ResourceData, m interface{}) (err error) {
+func linkServerOrganizationRead(d *schema.ResourceData, m interface{}) error {
 	sch := schemas.LoadLinkServerOrganization(d)
 	d.Set("server", sch.Server)
 	d.Set("organization_id", sch.OrganizationId)
 	d.SetId(sch.Id)
 
-	return
+	return nil
 }
 
-func linkServerOrganizationDelete(d *schema.ResourceData, m interface{}) (err error) {
+func linkServerOrganizationDelete(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadLinkServerOrganization(d)
 
-	err = linkServerOrganizationDel(prvdr, sch)
+	err := linkServerOrganizationDel(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	d.SetId("")
 
-	return
+	return nil
 }

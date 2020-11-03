@@ -3,7 +3,6 @@ package resources
 import (
 	"fmt"
 
-	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/request"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
@@ -98,28 +97,19 @@ type serverData struct {
 	JumboFrames      bool        `json:"jumbo_frames"`
 }
 
-func serverGet(prvdr *schemas.Provider, sch *schemas.Server) (
-	data *serverData, err error) {
+func serverGet(prvdr *schemas.Provider, sch *schemas.Server) (*serverData, error) {
 
 	req := request.Request{
 		Method: "GET",
 		Path:   fmt.Sprintf("/server/%s", sch.Id),
 	}
 
-	resp, err := req.Do(prvdr, data)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode == 400 || resp.StatusCode == 400 {
-		data = nil
-	}
-
-	return
+	data := &serverData{}
+	_, err := req.Do(prvdr, data)
+	return data, err
 }
 
-func serverPut(prvdr *schemas.Provider, sch *schemas.Server) (
-	data *serverData, err error) {
+func serverPut(prvdr *schemas.Provider, sch *schemas.Server) (*serverData, error) {
 
 	req := request.Request{
 		Method: "PUT",
@@ -176,22 +166,13 @@ func serverPut(prvdr *schemas.Provider, sch *schemas.Server) (
 		},
 	}
 
-	data = &serverData{}
+	data := &serverData{}
+	_, err := req.Do(prvdr, data)
 
-	resp, err := req.Do(prvdr, data)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode == 404 {
-		data = nil
-	}
-
-	return
+	return data, err
 }
 
-func serverPost(prvdr *schemas.Provider, sch *schemas.Server) (
-	data *serverData, err error) {
+func serverPost(prvdr *schemas.Provider, sch *schemas.Server) (*serverData, error) {
 
 	req := request.Request{
 		Method: "POST",
@@ -248,118 +229,78 @@ func serverPost(prvdr *schemas.Provider, sch *schemas.Server) (
 		},
 	}
 
-	data = &serverData{}
+	data := &serverData{}
+	_, err := req.Do(prvdr, data)
 
-	resp, err := req.Do(prvdr, data)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode == 404 {
-		err = errors.New("server: Not found on post")
-
-		return
-	}
-
-	return
+	return data, err
 }
 
-func serverDel(prvdr *schemas.Provider, sch *schemas.Server) (
-	err error) {
+func serverDel(prvdr *schemas.Provider, sch *schemas.Server) error {
 
 	req := request.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/server/%s", sch.Id),
 	}
 
-	_, err = req.Do(prvdr, nil)
+	_, err := req.Do(prvdr, nil)
 
-	if err != nil {
-		return
-	}
-
-	return
+	return err
 }
 
-func serverCreate(d *schema.ResourceData, m interface{}) (err error) {
+func serverCreate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadServer(d)
 
-	data, err := serverGet(prvdr, sch)
+	_, err := serverPost(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
-	if data != nil {
-		sch.Id = data.Id
+	d.SetId(sch.Id)
 
-		data, err = serverPut(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	if data == nil {
-		data, err = serverPost(prvdr, sch)
-		if err != nil {
-			return
-		}
-	}
-
-	d.SetId(data.Id)
-
-	return
+	return nil
 }
 
-func serverUpdate(d *schema.ResourceData, m interface{}) (err error) {
+func serverUpdate(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadServer(d)
 
-	data, err := serverPut(prvdr, sch)
+	_, err := serverPut(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
-	if data == nil {
-		// d.SetId("")
-		return
-	}
+	d.SetId(sch.Id)
 
-	d.SetId(data.Id)
-
-	return
+	return nil
 }
 
-func serverRead(d *schema.ResourceData, m interface{}) (err error) {
+func serverRead(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadServer(d)
 
-	data, err := serverGet(prvdr, sch)
+	_, err := serverGet(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
-	if data == nil {
-		return
-	}
-
-	d.Set("name", data.Name)
-	d.SetId(data.Id)
+	d.Set("name", sch.Name)
+	d.SetId(sch.Id)
 	// d.Set("port", data.Port)
 
-	return
+	return nil
 }
 
-func serverDelete(d *schema.ResourceData, m interface{}) (err error) {
+func serverDelete(d *schema.ResourceData, m interface{}) error {
 	prvdr := m.(*schemas.Provider)
 	sch := schemas.LoadServer(d)
 
-	err = serverDel(prvdr, sch)
+	err := serverDel(prvdr, sch)
 	if err != nil {
-		return
+		return err
 	}
 
 	d.SetId("")
 
-	return
+	return nil
 }

@@ -11,12 +11,10 @@ type LinkServerOrganization struct {
 	Name           interface{} `json:"name"`
 }
 
-func LoadLinkServerOrganization(d *schema.ResourceData) (sch *LinkServerOrganization) {
-	sch = &LinkServerOrganization{
+func LoadLinkServerOrganization(d *schema.ResourceData) *LinkServerOrganization {
+	return &LinkServerOrganization{
 		Id:             d.Id(),
 		OrganizationId: d.Get("organization_id").(string),
 		Server:         d.Get("server").(string),
 	}
-
-	return
 }

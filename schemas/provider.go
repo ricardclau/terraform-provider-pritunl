@@ -10,12 +10,10 @@ type Provider struct {
 	PritunlSecret string
 }
 
-func LoadProvider(d *schema.ResourceData) (sch *Provider) {
-	sch = &Provider{
+func LoadProvider(d *schema.ResourceData) *Provider {
+	return &Provider{
 		PritunlHost:   d.Get("pritunl_host").(string),
 		PritunlToken:  d.Get("pritunl_token").(string),
 		PritunlSecret: d.Get("pritunl_secret").(string),
 	}
-
-	return
 }

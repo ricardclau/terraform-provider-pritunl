@@ -55,8 +55,8 @@ type Server struct {
 	JumboFrames      bool        `json:"jumbo_frames"`
 }
 
-func LoadServer(d *schema.ResourceData) (sch *Server) {
-	sch = &Server{
+func LoadServer(d *schema.ResourceData) *Server {
+	sch := &Server{
 		Id:               d.Id(),
 		Protocol:         "udp",
 		MaxDevices:       0,
@@ -113,5 +113,5 @@ func LoadServer(d *schema.ResourceData) (sch *Server) {
 		}
 	}
 
-	return
+	return sch
 }
