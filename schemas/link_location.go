@@ -1,5 +1,6 @@
 package schemas
 
+/*
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -19,3 +20,4 @@ func LoadLinkLocation(d *schema.ResourceData) (sch *LinkLocation) {
 
 	return
 }
+*/

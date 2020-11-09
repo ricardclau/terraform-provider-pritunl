@@ -1,4 +1,4 @@
-package request
+package client
 
 import (
 	"bytes"
@@ -16,12 +16,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pritunl/terraform-provider-pritunl/schemas"
 	"gopkg.in/mgo.v2/bson"
 )
 
-var client = &http.Client{
-	Timeout: 10 * time.Second,
+type PritunlClient struct {
+	client *http.Client
+	host   string
+	token  string
+	secret string
 }
 
 type Request struct {
@@ -31,21 +33,34 @@ type Request struct {
 	Json   interface{}
 }
 
-func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (*http.Response, error) {
+func NewPritunlClient(host string, token string, secret string, httpClient *http.Client) *PritunlClient {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
 
-	url := "https://" + prvdr.PritunlHost + r.Path
+	return &PritunlClient{
+		host:   host,
+		token:  token,
+		secret: secret,
+		client: httpClient,
+	}
+}
+
+func (c *PritunlClient) Do(r Request, respVal interface{}) error {
+
+	url := "https://" + c.host + r.Path
 
 	authTimestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	authNonce := bson.NewObjectId().Hex()
 	authString := strings.Join([]string{
-		prvdr.PritunlToken,
+		c.token,
 		authTimestamp,
 		authNonce,
 		r.Method,
 		r.Path,
 	}, "&")
 
-	hashFunc := hmac.New(sha256.New, []byte(prvdr.PritunlSecret))
+	hashFunc := hmac.New(sha256.New, []byte(c.secret))
 	hashFunc.Write([]byte(authString))
 	rawSignature := hashFunc.Sum(nil)
 	authSig := base64.StdEncoding.EncodeToString(rawSignature)
@@ -54,24 +69,17 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (*http.Respon
 	if r.Json != nil {
 		data, e := json.Marshal(r.Json)
 		if e != nil {
-			err := fmt.Errorf("request: Json marshal error: %v", e)
-
-			return nil, err
+			return fmt.Errorf("client: Json marshal error: %v", e)
 		}
 
 		body = bytes.NewBuffer(data)
 	}
 
-	// Disable SSL Check for local testing
-	// if prvdr.PritunlHost == "localhost" {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	// }
 
 	req, err := http.NewRequest(r.Method, url, body)
 	if err != nil {
-		err = fmt.Errorf("request: Failed to create request: %v", err)
-
-		return nil, err
+		return fmt.Errorf("client: Failed to create client: %v", err)
 	}
 
 	if r.Query != nil {
@@ -84,7 +92,7 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (*http.Respon
 		req.URL.RawQuery = query.Encode()
 	}
 
-	req.Header.Set("Auth-Token", prvdr.PritunlToken)
+	req.Header.Set("Auth-Token", c.token)
 	req.Header.Set("Auth-Timestamp", authTimestamp)
 	req.Header.Set("Auth-Nonce", authNonce)
 	req.Header.Set("Auth-Signature", authSig)
@@ -93,34 +101,27 @@ func (r *Request) Do(prvdr *schemas.Provider, respVal interface{}) (*http.Respon
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	log.Println(fmt.Sprintf("[DEBUG] Sending Request: %s", req))
+	log.Println(fmt.Sprintf("[DEBUG] Ricard Request: %s", req))
 
-	resp, err := client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request: Request error: %v", err)
+		return fmt.Errorf("client: Request error: %v", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return nil, fmt.Errorf("request: Bad response status %d for req: %v", resp.StatusCode, req)
-	}
-
 	info, _ := ioutil.ReadAll(resp.Body)
-	log.Println(fmt.Sprintf("[DEBUG] Response Status: %v Body: %s", resp.StatusCode, info))
+	log.Println(fmt.Sprintf("[DEBUG] Ricard Response: %v Body: %s", resp.StatusCode, string(info)))
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return fmt.Errorf("client: Bad response status %d for req: %v", resp.StatusCode, req)
+	}
 
 	if respVal != nil {
 		err = json.Unmarshal(info, &respVal)
-		//log.Printf("[DEBUG] Returned Request: %s", respVal)
-		// if r.Path == "/settings" {
-		// 	var settingsResp *schemas.Settings
-		// 	mapstructure.Decode(respVal, &settingsResp)
-		// 	log.Printf("[DEBUG] Returned Response settings: %s", settingsResp)
-		// 	return
-		// }
 		if err != nil {
-			return nil, fmt.Errorf("request: Failed to parse response, %v, Body: %s", err, info)
+			return fmt.Errorf("client: Failed to parse response, %v, Body: %s", err, info)
 		}
 	}
 
-	return resp, nil
+	return nil
 }

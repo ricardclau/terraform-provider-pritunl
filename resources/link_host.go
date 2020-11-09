@@ -1,10 +1,11 @@
 package resources
 
+/*
 import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/request"
+	"github.com/pritunl/terraform-provider-pritunl/client"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
@@ -89,7 +90,7 @@ type linkHostData struct {
 
 func linkHostGet(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHostData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "GET",
 		Path:   fmt.Sprintf("/link/%s/host", sch.LocationId),
 		Query: map[string]string{
@@ -115,7 +116,7 @@ func linkHostGet(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHost
 func linkHostPut(prvdr *schemas.Provider, sch *schemas.LinkHost) (
 	data *linkHostData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "PUT",
 		Path:   fmt.Sprintf("/link/%s/host/%s", sch.LocationId, sch.Id),
 		Json: &linkHostPutData{
@@ -145,7 +146,7 @@ func linkHostPut(prvdr *schemas.Provider, sch *schemas.LinkHost) (
 
 func linkHostPost(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHostData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "POST",
 		Path:   fmt.Sprintf("/link/%s/host", sch.LocationId),
 		Json: &linkHostPostData{
@@ -177,7 +178,7 @@ func linkHostPost(prvdr *schemas.Provider, sch *schemas.LinkHost) (data *linkHos
 
 func linkHostDel(prvdr *schemas.Provider, sch *schemas.LinkHost) (err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/link/%s/host/%s", sch.LocationId, sch.Id),
 	}
@@ -279,3 +280,4 @@ func linkHostDelete(d *schema.ResourceData, m interface{}) (err error) {
 
 	return
 }
+*/

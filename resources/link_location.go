@@ -1,10 +1,11 @@
 package resources
 
+/*
 import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/request"
+	"github.com/pritunl/terraform-provider-pritunl/client"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
@@ -43,7 +44,7 @@ type linkLocationData struct {
 func linkLocationGet(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 	data *linkLocationData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "GET",
 		Path:   fmt.Sprintf("/link/%s/location", sch.LinkId),
 		Query: map[string]string{
@@ -69,7 +70,7 @@ func linkLocationGet(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 func linkLocationPut(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 	data *linkLocationData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "PUT",
 		Path:   fmt.Sprintf("/link/%s/location/%s", sch.LinkId, sch.Id),
 		Json: &linkLocationPutData{
@@ -94,7 +95,7 @@ func linkLocationPut(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 func linkLocationPost(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 	data *linkLocationData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "POST",
 		Path:   fmt.Sprintf("/link/%s/location", sch.LinkId),
 		Json: &linkLocationPostData{
@@ -121,7 +122,7 @@ func linkLocationPost(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 func linkLocationDel(prvdr *schemas.Provider, sch *schemas.LinkLocation) (
 	err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/link/%s/location/%s", sch.LinkId, sch.Id),
 	}
@@ -216,3 +217,4 @@ func linkLocationDelete(d *schema.ResourceData, m interface{}) (err error) {
 
 	return
 }
+*/

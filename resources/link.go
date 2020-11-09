@@ -1,10 +1,12 @@
 package resources
 
+/*
 import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/pritunl/terraform-provider-pritunl/request"
+	"github.com/pritunl/terraform-provider-pritunl/client"
+	"github.com/pritunl/terraform-provider-pritunl/pritunl"
 	"github.com/pritunl/terraform-provider-pritunl/schemas"
 )
 
@@ -46,10 +48,10 @@ type linkData struct {
 	Ipv6   bool   `json:"ipv6"`
 }
 
-func linkGet(prvdr *schemas.Provider, sch *schemas.Link) (
+func linkGet(prvdr *pritunl.Provider, sch *schemas.Link) (
 	data *linkData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "GET",
 		Path:   "/link",
 		Query: map[string]string{
@@ -75,7 +77,7 @@ func linkGet(prvdr *schemas.Provider, sch *schemas.Link) (
 func linkPut(prvdr *schemas.Provider, sch *schemas.Link) (
 	data *linkData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "PUT",
 		Path:   fmt.Sprintf("/link/%s", sch.Id),
 		Json: &linkPutData{
@@ -101,7 +103,7 @@ func linkPut(prvdr *schemas.Provider, sch *schemas.Link) (
 func linkPost(prvdr *schemas.Provider, sch *schemas.Link) (
 	data *linkData, err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "POST",
 		Path:   "/link",
 		Json: &linkPostData{
@@ -129,7 +131,7 @@ func linkPost(prvdr *schemas.Provider, sch *schemas.Link) (
 func linkDel(prvdr *schemas.Provider, sch *schemas.Link) (
 	err error) {
 
-	req := request.Request{
+	req := client.Request{
 		Method: "DELETE",
 		Path:   fmt.Sprintf("/link/%s", sch.Id),
 	}
@@ -225,3 +227,4 @@ func linkDelete(d *schema.ResourceData, m interface{}) (err error) {
 
 	return
 }
+*/
