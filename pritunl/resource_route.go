@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+// The Pritunl routes API cannot create multiple routes concurrently and this is why this
+// mutex semaphore is created on create, update and delete operations
 var mutex = &sync.Mutex{}
 
 func ResourceRoute() *schema.Resource {

@@ -28,10 +28,17 @@ func Provider() terraform.ResourceProvider {
 				Required: true,
 			},
 		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"pritunl_organization": DataSourceOrganization(),
+			"pritunl_user":         DataSourceUser(),
+			"pritunl_route":        DataSourceRoute(),
+			"pritunl_server":       DataSourceServer(),
+		},
 		ResourcesMap: map[string]*schema.Resource{
 			"pritunl_organization": ResourceOrganization(),
 			"pritunl_user":         ResourceUser(),
 			"pritunl_route":        ResourceRoute(),
+			"pritunl_server":       ResourceServer(),
 			/*
 				"pritunl_link":          ResourceLink(),
 				"pritunl_link_location": ResourceLinkLocation(),

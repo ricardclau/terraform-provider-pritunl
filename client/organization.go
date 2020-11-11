@@ -13,6 +13,28 @@ type OrganizationData struct {
 	Name string `json:"name"`
 }
 
+func (c *PritunlClient) OrganizationGetByName(name string) (*OrganizationData, error) {
+	req := Request{
+		Method: "GET",
+		Path:   fmt.Sprintf("/organization"),
+	}
+
+	var data []OrganizationData
+
+	err := c.Do(req, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, org := range data {
+		if org.Name == name {
+			return &org, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Cannot find organization with name: %v", name)
+}
+
 func (c *PritunlClient) OrganizationGet(id string) (*OrganizationData, error) {
 
 	req := Request{

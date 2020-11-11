@@ -84,10 +84,10 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 		AuthType:        d.Get("auth_type").(string),
 		Groups:          nil,
 		Pin:             d.Get("pin").(string),
-		Disabled:        false,
+		Disabled:        d.Get("disabled").(bool),
 		NetworkLinks:    nil,
-		BypassSecondary: false,
-		ClientToClient:  false,
+		BypassSecondary: d.Get("bypass_secondary").(bool),
+		ClientToClient:  d.Get("client_to_client").(bool),
 		DnsServers:      nil,
 		DnsSuffix:       "",
 	}
@@ -114,7 +114,9 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", data.Name)
 	d.Set("auth_type", data.AuthType)
 	d.Set("email", data.Email)
-	// d.Set("pin", data.Pin)
+	d.Set("disabled", data.Disabled)
+	d.Set("bypass_secondary", data.BypassSecondary)
+	d.Set("client_to_client", data.ClientToClient)
 
 	return nil
 }
@@ -130,10 +132,10 @@ func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
 		AuthType:        d.Get("auth_type").(string),
 		Groups:          nil,
 		Pin:             d.Get("pin").(string),
-		Disabled:        false,
+		Disabled:        d.Get("disabled").(bool),
 		NetworkLinks:    nil,
-		BypassSecondary: false,
-		ClientToClient:  false,
+		BypassSecondary: d.Get("bypass_secondary").(bool),
+		ClientToClient:  d.Get("client_to_client").(bool),
 		DnsServers:      nil,
 		DnsSuffix:       "",
 	}

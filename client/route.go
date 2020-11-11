@@ -28,6 +28,28 @@ type RoutePostData struct {
 	Advertise    bool   `json:"advertise"`
 }
 
+func (c *PritunlClient) RouteGetByNetwork(serverId string, network string) (*RouteData, error) {
+	req := Request{
+		Method: "GET",
+		Path:   fmt.Sprintf("/server/%s/route", serverId),
+	}
+
+	var data []RouteData
+	err := c.Do(req, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, route := range data {
+		log.Println(fmt.Sprintf("[DEBUG] route.Network: %s vs network %s", route.Network, network))
+		if route.Network == network {
+			return &route, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Cannot find route with network: %v in server: %v", network, serverId)
+}
+
 func (c *PritunlClient) RouteGet(serverId string, routeId string) (*RouteData, error) {
 	req := Request{
 		Method: "GET",
@@ -59,11 +81,8 @@ func (c *PritunlClient) RouteCreate(serverId string, r RoutePostData) (*RouteDat
 
 	data := &RouteData{}
 	err := c.Do(req, data)
-	if err != nil {
-		return nil, err
-	}
 
-	return data, nil
+	return data, err
 }
 
 func (c *PritunlClient) RouteUpdate(serverId string, routeId string, r RoutePostData) (*RouteData, error) {
@@ -75,11 +94,8 @@ func (c *PritunlClient) RouteUpdate(serverId string, routeId string, r RoutePost
 
 	data := &RouteData{}
 	err := c.Do(req, data)
-	if err != nil {
-		return nil, err
-	}
 
-	return data, nil
+	return data, err
 }
 
 func (c *PritunlClient) RouteDelete(serverId string, routeId string) error {

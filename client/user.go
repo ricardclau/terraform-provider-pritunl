@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"log"
 )
 
 type UserPostData struct {
@@ -32,6 +33,30 @@ type UserData struct {
 	DnsSuffix       string   `json:"dns_suffix,omitempty"`
 }
 
+func (c *PritunlClient) UserGetByName(organizationId string, name string) (*UserData, error) {
+	req := Request{
+		Method: "GET",
+		Path:   fmt.Sprintf("/user/%s", organizationId),
+	}
+
+	var data []UserData
+
+	err := c.Do(req, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range data {
+		log.Println(fmt.Sprintf("[DEBUG] user.Name: %s vs name %s", user.Name, name))
+		if user.Name == name {
+			return &user, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Cannot find user with name: %v in organization: %v", name, organizationId)
+
+}
+
 func (c *PritunlClient) UserGet(organizationId string, userId string) (*UserData, error) {
 	req := Request{
 		Method: "GET",
@@ -40,11 +65,8 @@ func (c *PritunlClient) UserGet(organizationId string, userId string) (*UserData
 
 	data := &UserData{}
 	err := c.Do(req, data)
-	if err != nil {
-		return nil, err
-	}
 
-	return data, nil
+	return data, err
 }
 
 func (c *PritunlClient) UserCreate(organizationId string, u UserPostData) (*UserData, error) {
@@ -74,12 +96,8 @@ func (c *PritunlClient) UserUpdate(organizationId string, userId string, u UserP
 
 	data := &UserData{}
 	err := c.Do(req, data)
-	if err != nil {
-		return nil, err
-	}
 
-	return data, nil
-
+	return data, err
 }
 
 func (c *PritunlClient) UserDelete(organizationId string, userId string) error {
