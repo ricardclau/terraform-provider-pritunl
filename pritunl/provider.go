@@ -39,11 +39,6 @@ func Provider() terraform.ResourceProvider {
 			"pritunl_user":         ResourceUser(),
 			"pritunl_route":        ResourceRoute(),
 			"pritunl_server":       ResourceServer(),
-			/*
-				"pritunl_link":          ResourceLink(),
-				"pritunl_link_location": ResourceLinkLocation(),
-				"pritunl_link_host":     ResourceLinkHost(),
-			*/
 		},
 		ConfigureFunc: providerConfigure,
 	}

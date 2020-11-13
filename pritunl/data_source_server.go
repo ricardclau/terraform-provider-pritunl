@@ -35,6 +35,21 @@ func DataSourceServer() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"ipv6": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"otp_auth": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"wg": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -52,8 +67,12 @@ func DataSourceServerRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", data.Name)
 	d.Set("network", data.Network)
 	d.Set("port", data.Port)
+	d.Set("protocol", data.Protocol)
 	d.Set("groups", data.Groups)
 	d.Set("dns_servers", data.DNSServers)
+	d.Set("ipv6", data.Ipv6)
+	d.Set("otp_auth", data.OtpAuth)
+	d.Set("wg", data.Wg)
 
 	return nil
 }
