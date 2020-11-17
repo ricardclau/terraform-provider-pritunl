@@ -16,7 +16,9 @@ func ResourceRoute() *schema.Resource {
 		Read:   ResourceRouteRead,
 		Update: ResourceRouteUpdate,
 		Delete: ResourceRouteDelete,
-
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		Schema: map[string]*schema.Schema{
 			"server": {
 				Type:     schema.TypeString,
