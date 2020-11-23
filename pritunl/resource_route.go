@@ -1,8 +1,10 @@
 package pritunl
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/client"
+	"strings"
 	"sync"
 )
 
@@ -22,6 +24,7 @@ func ResourceRoute() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"server": {
 				Type:     schema.TypeString,
+				ForceNew: true,
 				Required: true,
 			},
 			"network": {
@@ -82,7 +85,7 @@ func ResourceRouteCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	d.SetId(routeData.Id)
+	d.SetId(fmt.Sprintf("%s:%s", serverId, routeData.Id))
 
 	return ResourceRouteRead(d, m)
 }
@@ -90,7 +93,11 @@ func ResourceRouteCreate(d *schema.ResourceData, m interface{}) error {
 func ResourceRouteUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	serverId := d.Get("server").(string)
+	serverId, routeId, err := resourceRouteParseId(d.Id())
+	if err != nil {
+		return err
+	}
+
 	r := client.RoutePostData{
 		Network:      d.Get("network").(string),
 		Comment:      d.Get("comment").(string),
@@ -103,7 +110,7 @@ func ResourceRouteUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	mutex.Lock()
-	_, err := c.RouteUpdate(serverId, d.Id(), r)
+	_, err = c.RouteUpdate(serverId, routeId, r)
 	mutex.Unlock()
 
 	if err != nil {
@@ -116,8 +123,12 @@ func ResourceRouteUpdate(d *schema.ResourceData, m interface{}) error {
 func ResourceRouteRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	serverId := d.Get("server").(string)
-	data, err := c.RouteGet(serverId, d.Id())
+	serverId, routeId, err := resourceRouteParseId(d.Id())
+	if err != nil {
+		return err
+	}
+
+	data, err := c.RouteGet(serverId, routeId)
 	if err != nil {
 		return err
 	}
@@ -137,10 +148,13 @@ func ResourceRouteRead(d *schema.ResourceData, m interface{}) error {
 func ResourceRouteDelete(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	serverId := d.Get("server").(string)
+	serverId, routeId, err := resourceRouteParseId(d.Id())
+	if err != nil {
+		return err
+	}
 
 	mutex.Lock()
-	err := c.RouteDelete(serverId, d.Id())
+	err = c.RouteDelete(serverId, routeId)
 	mutex.Unlock()
 
 	if err != nil {
@@ -150,4 +164,16 @@ func ResourceRouteDelete(d *schema.ResourceData, m interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+func resourceRouteParseId(id string) (serverId, routeId string, err error) {
+	parts := strings.SplitN(id, ":", 2)
+	if len(parts) != 2 {
+		err = fmt.Errorf("user id must be of the form <org_id>:<user_id>")
+		return
+	}
+
+	serverId = parts[0]
+	routeId = parts[1]
+	return
 }

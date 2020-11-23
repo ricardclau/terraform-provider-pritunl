@@ -1,6 +1,9 @@
 package pritunl
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/client"
 )
@@ -17,6 +20,7 @@ func ResourceUser() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"organization_id": {
 				Type:     schema.TypeString,
+				ForceNew: true,
 				Required: true,
 			},
 			"name": {
@@ -100,7 +104,7 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	d.SetId(userData.Id)
+	d.SetId(fmt.Sprintf("%s:%s", organizationId, userData.Id))
 
 	return resourceUserRead(d, m)
 }
@@ -108,8 +112,12 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	organizationId := d.Get("organization_id").(string)
-	data, err := c.UserGet(organizationId, d.Id())
+	organizationId, userId, err := resourceUserParseId(d.Id())
+	if err != nil {
+		return err
+	}
+
+	data, err := c.UserGet(organizationId, userId)
 	if err != nil {
 		return err
 	}
@@ -127,7 +135,10 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	organizationId := d.Get("organization_id").(string)
+	organizationId, userId, err := resourceUserParseId(d.Id())
+	if err != nil {
+		return err
+	}
 
 	u := client.UserPostData{
 		Name:            d.Get("name").(string),
@@ -143,7 +154,7 @@ func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
 		DnsSuffix:       "",
 	}
 
-	_, err := c.UserUpdate(organizationId, d.Id(), u)
+	_, err = c.UserUpdate(organizationId, userId, u)
 	if err != nil {
 		return err
 	}
@@ -154,8 +165,12 @@ func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
 func resourceUserDelete(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	organizationId := d.Get("organization_id").(string)
-	err := c.UserDelete(organizationId, d.Id())
+	organizationId, userId, err := resourceUserParseId(d.Id())
+	if err != nil {
+		return err
+	}
+
+	err = c.UserDelete(organizationId, userId)
 	if err != nil {
 		return err
 	}
@@ -163,4 +178,16 @@ func resourceUserDelete(d *schema.ResourceData, m interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+func resourceUserParseId(id string) (organizationId, userId string, err error) {
+	parts := strings.SplitN(id, ":", 2)
+	if len(parts) != 2 {
+		err = fmt.Errorf("user id must be of the form <org_id>:<user_id>")
+		return
+	}
+
+	organizationId = parts[0]
+	userId = parts[1]
+	return
 }
