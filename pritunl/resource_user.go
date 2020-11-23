@@ -122,6 +122,7 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	d.Set("organization_id", organizationId)
 	d.Set("name", data.Name)
 	d.Set("auth_type", data.AuthType)
 	d.Set("email", data.Email)

@@ -133,6 +133,7 @@ func ResourceRouteRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	d.Set("server", serverId)
 	d.Set("network", data.Network)
 	d.Set("comment", data.Comment)
 	d.Set("nat", data.Nat)
