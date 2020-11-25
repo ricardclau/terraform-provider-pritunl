@@ -26,7 +26,7 @@ func DataSourceUser() *schema.Resource {
 				Required: true,
 			},
 			"groups": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -41,7 +41,7 @@ func DataSourceUser() *schema.Resource {
 				Optional: true,
 			},
 			"network_links": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -56,7 +56,7 @@ func DataSourceUser() *schema.Resource {
 				Optional: true,
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -86,6 +86,10 @@ func DataSourceUserRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("disabled", data.Disabled)
 	d.Set("bypass_secondary", data.BypassSecondary)
 	d.Set("client_to_client", data.ClientToClient)
+	d.Set("groups", data.Groups)
+	d.Set("network_links", data.NetworkLinks)
+	d.Set("dns_servers", data.DnsServers)
+	d.Set("dns_suffix", data.DnsSuffix)
 
 	return nil
 }

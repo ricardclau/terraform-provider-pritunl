@@ -36,7 +36,7 @@ func ResourceUser() *schema.Resource {
 				Required: true,
 			},
 			"groups": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -51,7 +51,7 @@ func ResourceUser() *schema.Resource {
 				Optional: true,
 			},
 			"network_links": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -66,7 +66,7 @@ func ResourceUser() *schema.Resource {
 				Optional: true,
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -89,14 +89,14 @@ func resourceUserCreate(d *schema.ResourceData, m interface{}) error {
 		Name:            d.Get("name").(string),
 		Email:           d.Get("email").(string),
 		AuthType:        d.Get("auth_type").(string),
-		Groups:          nil,
+		Groups:          expandStringListFromSetSchema(d.Get("groups").(*schema.Set)),
 		Pin:             d.Get("pin").(string),
 		Disabled:        d.Get("disabled").(bool),
-		NetworkLinks:    nil,
+		NetworkLinks:    expandStringListFromSetSchema(d.Get("network_links").(*schema.Set)),
 		BypassSecondary: d.Get("bypass_secondary").(bool),
 		ClientToClient:  d.Get("client_to_client").(bool),
-		DnsServers:      nil,
-		DnsSuffix:       "",
+		DnsServers:      expandStringListFromSetSchema(d.Get("dns_servers").(*schema.Set)),
+		DnsSuffix:       d.Get("dns_suffix").(string),
 	}
 
 	userData, err := c.UserCreate(organizationId, u)
@@ -129,6 +129,10 @@ func resourceUserRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("disabled", data.Disabled)
 	d.Set("bypass_secondary", data.BypassSecondary)
 	d.Set("client_to_client", data.ClientToClient)
+	d.Set("groups", data.Groups)
+	d.Set("network_links", data.NetworkLinks)
+	d.Set("dns_servers", data.DnsServers)
+	d.Set("dns_suffix", data.DnsSuffix)
 
 	return nil
 }
@@ -145,14 +149,14 @@ func resourceUserUpdate(d *schema.ResourceData, m interface{}) error {
 		Name:            d.Get("name").(string),
 		Email:           d.Get("email").(string),
 		AuthType:        d.Get("auth_type").(string),
-		Groups:          nil,
+		Groups:          expandStringListFromSetSchema(d.Get("groups").(*schema.Set)),
 		Pin:             d.Get("pin").(string),
 		Disabled:        d.Get("disabled").(bool),
-		NetworkLinks:    nil,
+		NetworkLinks:    expandStringListFromSetSchema(d.Get("network_links").(*schema.Set)),
 		BypassSecondary: d.Get("bypass_secondary").(bool),
 		ClientToClient:  d.Get("client_to_client").(bool),
-		DnsServers:      nil,
-		DnsSuffix:       "",
+		DnsServers:      expandStringListFromSetSchema(d.Get("dns_servers").(*schema.Set)),
+		DnsSuffix:       d.Get("dns_suffix").(string),
 	}
 
 	_, err = c.UserUpdate(organizationId, userId, u)

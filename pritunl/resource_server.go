@@ -24,14 +24,14 @@ func ResourceServer() *schema.Resource {
 				Required: true,
 			},
 			"groups": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -71,10 +71,10 @@ func ResourceServerCreate(d *schema.ResourceData, m interface{}) error {
 		Name: d.Get("name").(string),
 		// This is autopopulated in the UI ????
 		Network:    d.Get("network").(string),
-		DNSServers: d.Get("dns_servers").([]string),
+		DNSServers: expandStringListFromSetSchema(d.Get("dns_servers").(*schema.Set)),
 		Port:       d.Get("port").(int),
 		Protocol:   d.Get("protocol").(string),
-		Groups:     d.Get("groups").([]string),
+		Groups:     expandStringListFromSetSchema(d.Get("groups").(*schema.Set)),
 		Ipv6:       d.Get("ipv6").(bool),
 		OtpAuth:    d.Get("otp_auth").(bool),
 		Wg:         d.Get("wg").(bool),
@@ -92,10 +92,10 @@ func ResourceServerUpdate(d *schema.ResourceData, m interface{}) error {
 		Name: d.Get("name").(string),
 		// This is autopopulated in the UI ????
 		Network:    d.Get("network").(string),
-		DNSServers: d.Get("dns_servers").([]string),
+		DNSServers: expandStringListFromSetSchema(d.Get("dns_servers").(*schema.Set)),
 		Port:       d.Get("port").(int),
 		Protocol:   d.Get("protocol").(string),
-		Groups:     d.Get("groups").([]string),
+		Groups:     expandStringListFromSetSchema(d.Get("groups").(*schema.Set)),
 		Ipv6:       d.Get("ipv6").(bool),
 		OtpAuth:    d.Get("otp_auth").(bool),
 		Wg:         d.Get("wg").(bool),
