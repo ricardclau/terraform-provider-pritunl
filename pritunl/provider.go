@@ -35,10 +35,11 @@ func Provider() terraform.ResourceProvider {
 			"pritunl_server":       DataSourceServer(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"pritunl_organization": ResourceOrganization(),
-			"pritunl_user":         ResourceUser(),
-			"pritunl_route":        ResourceRoute(),
-			"pritunl_server":       ResourceServer(),
+			"pritunl_organization":             ResourceOrganization(),
+			"pritunl_user":                     ResourceUser(),
+			"pritunl_route":                    ResourceRoute(),
+			"pritunl_server":                   ResourceServer(),
+			"pritunl_link_server_organization": ResourceLinkServerOrganization(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
