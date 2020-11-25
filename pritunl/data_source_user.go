@@ -19,52 +19,52 @@ func DataSourceUser() *schema.Resource {
 			},
 			"email": {
 				Type:     schema.TypeString,
-				Required: true,
+				Computed: true,
 			},
 			"auth_type": {
 				Type:     schema.TypeString,
-				Required: true,
+				Computed: true,
 			},
 			"groups": {
 				Type:     schema.TypeSet,
-				Optional: true,
+				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"pin": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"disabled": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 			"network_links": {
 				Type:     schema.TypeSet,
-				Optional: true,
+				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"bypass_secondary": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 			"client_to_client": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 			"dns_servers": {
 				Type:     schema.TypeSet,
-				Optional: true,
+				Computed: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"dns_suffix": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			}},
 	}
 }

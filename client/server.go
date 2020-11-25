@@ -71,16 +71,16 @@ type ServerPostData struct {
 	NetworkStart     string      `json:"network_start"`
 	Name             string      `json:"name"`
 	PingInterval     int         `json:"ping_interval"`
-	AllowedDevices   interface{} `json:"allowed_devices"`
+	AllowedDevices   string      `json:"allowed_devices"`
 	UsersOnline      int         `json:"users_online"`
 	Ipv6Firewall     bool        `json:"ipv6_firewall"`
-	SessionTimeout   interface{} `json:"session_timeout"`
+	SessionTimeout   int         `json:"session_timeout"`
 	OtpAuth          bool        `json:"otp_auth"`
 	MultiDevice      bool        `json:"multi_device"`
-	SearchDomain     interface{} `json:"search_domain"`
+	SearchDomain     string      `json:"search_domain"`
 	LzoCompression   bool        `json:"lzo_compression"`
-	PreConnectMsg    interface{} `json:"pre_connect_msg"`
-	InactiveTimeout  interface{} `json:"inactive_timeout"`
+	PreConnectMsg    string      `json:"pre_connect_msg"`
+	InactiveTimeout  int         `json:"inactive_timeout"`
 	LinkPingInterval int         `json:"link_ping_interval"`
 	PingTimeoutWg    int         `json:"ping_timeout_wg"`
 	Uptime           interface{} `json:"uptime"`
@@ -101,7 +101,7 @@ type ServerPostData struct {
 	InterClient      bool        `json:"inter_client"`
 	ReplicaCount     int         `json:"replica_count"`
 	Cipher           string      `json:"cipher"`
-	MssFix           interface{} `json:"mss_fix"`
+	MssFix           string      `json:"mss_fix"`
 	JumboFrames      bool        `json:"jumbo_frames"`
 }
 
@@ -142,7 +142,7 @@ func (c *PritunlClient) ServerGet(serverId string) (*ServerData, error) {
 func (c *PritunlClient) ServerCreate(s ServerPostData) (*ServerData, error) {
 	req := Request{
 		Method: "POST",
-		Path:   "/server/",
+		Path:   "/server",
 		Json:   s,
 	}
 

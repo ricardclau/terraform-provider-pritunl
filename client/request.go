@@ -110,10 +110,10 @@ func (c *PritunlClient) Do(r Request, respVal interface{}) error {
 	defer resp.Body.Close()
 
 	info, _ := ioutil.ReadAll(resp.Body)
-	log.Println(fmt.Sprintf("[DEBUG] Ricard Response: %v Body: %s", resp.StatusCode, string(info)))
+	log.Println(fmt.Sprintf("[DEBUG] Ricard Response: %d Body: %s", resp.StatusCode, string(info)))
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("client: Bad response status %d for req: %v", resp.StatusCode, req)
+		return fmt.Errorf("client: Bad response status %d Body: %s for req: %v", resp.StatusCode, string(info), req)
 	}
 
 	if respVal != nil {

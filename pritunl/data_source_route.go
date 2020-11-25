@@ -19,31 +19,31 @@ func DataSourceRoute() *schema.Resource {
 			},
 			"comment": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"nat": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 			"nat_interface": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"nat_netmap": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"advertise": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 			"metric": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"net_gateway": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 		},
 	}
