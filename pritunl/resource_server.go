@@ -77,10 +77,12 @@ func ResourceServer() *schema.Resource {
 			"ping_interval": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  10,
 			},
 			"link_ping_interval": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  1,
 			},
 			"inactive_timeout": {
 				Type:     schema.TypeInt,
@@ -93,6 +95,7 @@ func ResourceServer() *schema.Resource {
 			"max_clients": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  2000,
 			},
 			"network_mode": {
 				Type:         schema.TypeString,
@@ -125,10 +128,12 @@ func ResourceServer() *schema.Resource {
 			"ping_timeout": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  60,
 			},
 			"link_ping_timeout": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  5,
 			},
 			"allowed_devices": {
 				Type:         schema.TypeString,
@@ -143,6 +148,7 @@ func ResourceServer() *schema.Resource {
 			"replica_count": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  1,
 			},
 			"multi_device": {
 				Type:     schema.TypeBool,

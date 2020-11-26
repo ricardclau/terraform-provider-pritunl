@@ -13,7 +13,6 @@ func ResourceLinkServerOrganization() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceLinkServerOrganizationCreate,
 		Read:   resourceLinkServerOrganizationRead,
-		Update: resourceLinkServerOrganizationUpdate,
 		Delete: resourceLinkServerOrganizationDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -22,10 +21,12 @@ func ResourceLinkServerOrganization() *schema.Resource {
 			"organization_id": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"server": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 		},
 	}
@@ -34,32 +35,15 @@ func ResourceLinkServerOrganization() *schema.Resource {
 func resourceLinkServerOrganizationCreate(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	organizationId := d.Get("organizationId").(string)
 	server := d.Get("server").(string)
+	organizationId := d.Get("organization_id").(string)
 
-	data, err := c.LinkServerOrganizationCreate(server, organizationId)
+	_, err := c.LinkServerOrganizationAttach(server, organizationId)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%s:%s:%s", data.Id, server, organizationId))
-
-	return resourceLinkServerOrganizationRead(d, m)
-}
-
-func resourceLinkServerOrganizationUpdate(d *schema.ResourceData, m interface{}) error {
-	c := m.(*client.PritunlClient)
-
-	_, server, organizationId, err := resourceLinkServerOrganizationParseId(d.Id())
-	o := client.LinkServerOrganizationPostData{
-		OrganizationId: d.Get("organizationId").(string),
-		Server:         d.Get("server").(string),
-	}
-
-	_, err = c.LinkServerOrganizationUpdate(server, organizationId, o)
-	if err != nil {
-		return err
-	}
+	d.SetId(fmt.Sprintf("%s:%s", server, organizationId))
 
 	return resourceLinkServerOrganizationRead(d, m)
 }
@@ -67,7 +51,7 @@ func resourceLinkServerOrganizationUpdate(d *schema.ResourceData, m interface{})
 func resourceLinkServerOrganizationRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	_, server, organizationId, err := resourceLinkServerOrganizationParseId(d.Id())
+	server, organizationId, err := resourceLinkServerOrganizationParseId(d.Id())
 	if err != nil {
 		return err
 	}
@@ -90,7 +74,7 @@ func resourceLinkServerOrganizationRead(d *schema.ResourceData, m interface{}) e
 func resourceLinkServerOrganizationDelete(d *schema.ResourceData, m interface{}) error {
 	c := m.(*client.PritunlClient)
 
-	_, server, organizationId, err := resourceLinkServerOrganizationParseId(d.Id())
+	server, organizationId, err := resourceLinkServerOrganizationParseId(d.Id())
 	if err != nil {
 		return err
 	}
@@ -105,15 +89,14 @@ func resourceLinkServerOrganizationDelete(d *schema.ResourceData, m interface{})
 	return nil
 }
 
-func resourceLinkServerOrganizationParseId(id string) (resourceId, server, organizationId string, err error) {
-	parts := strings.SplitN(id, ":", 3)
-	if len(parts) != 3 {
-		err = fmt.Errorf("linkServerOrganization id must be of the form <id>:<server>:<org_id>")
+func resourceLinkServerOrganizationParseId(id string) (server, organizationId string, err error) {
+	parts := strings.SplitN(id, ":", 2)
+	if len(parts) != 2 {
+		err = fmt.Errorf("linkServerOrganization id must be of the form <server>:<org_id>")
 		return
 	}
 
-	resourceId = parts[0]
-	server = parts[1]
-	organizationId = parts[2]
+	server = parts[0]
+	organizationId = parts[1]
 	return
 }

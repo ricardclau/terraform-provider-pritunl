@@ -1,15 +1,11 @@
 package client
 
-import "fmt"
-
-type LinkServerOrganizationPostData struct {
-	OrganizationId string `json:"organization_id"`
-	Server         string `json:"server"`
-}
+import (
+	"fmt"
+)
 
 type LinkServerOrganizationData struct {
-	Id             string `json:"id"`
-	OrganizationId string `json:"organization_id"`
+	OrganizationId string `json:"id"`
 	Server         string `json:"server"`
 }
 
@@ -17,40 +13,27 @@ func (c *PritunlClient) LinkServerOrganizationGet(server string, organizationId 
 
 	req := Request{
 		Method: "GET",
-		Path:   fmt.Sprintf("/server/%s/organization/%s", server, organizationId),
+		Path:   fmt.Sprintf("/server/%s/organization", server),
 	}
-
-	data := &LinkServerOrganizationData{}
-	err := c.Do(req, data)
+	var data []LinkServerOrganizationData
+	err := c.Do(req, &data)
 	if err != nil {
 		return nil, err
 	}
 
-	return data, nil
+	for _, serverOrg := range data {
+		if serverOrg.OrganizationId == organizationId {
+			return &serverOrg, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Cannot find organizationId: %v in server: %v", organizationId, server)
 }
 
-func (c *PritunlClient) LinkServerOrganizationUpdate(server string, organizationId string, o LinkServerOrganizationPostData) (*LinkServerOrganizationData, error) {
+func (c *PritunlClient) LinkServerOrganizationAttach(server string, organizationId string) (*LinkServerOrganizationData, error) {
 
 	req := Request{
 		Method: "PUT",
-		Path:   fmt.Sprintf("/server/%s/organization/%s", server, organizationId),
-		Json:   &o,
-	}
-
-	data := &LinkServerOrganizationData{}
-
-	err := c.Do(req, data)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func (c *PritunlClient) LinkServerOrganizationCreate(server string, organizationId string) (*LinkServerOrganizationData, error) {
-
-	req := Request{
-		Method: "POST",
 		Path:   fmt.Sprintf("/server/%s/organization/%s", server, organizationId),
 	}
 
