@@ -26,16 +26,15 @@ $ go install
 
 If you check your `$GOPATH/bin` folder you should see a freshly compiled binary of this provider
 
-And now, in order to get terraform auto-discover mechanism to work you need to create a `~/.terraformrc` file with this content
+And now, in order to get terraform auto-discover mechanism to work you need to move the binary to `~/.terraform.d/plugins` 
+file with a name like `terraform-provider-pritunl_v0.0.1`
 
-```hcl
-providers {
-  pritunl = "${GOPATH}/bin/terraform-provider-pritunl"
-}
-```
 
 Using The Provider
 ---------------------
+
+In order to use the provider you can either build it as described in the previous section or you can also download
+the binaries for your architecture that are automatically created by our github workflows on [each new tag](https://github.com/ricardclau/terraform-provider-pritunl/tags)
 
 Terraform code example
 
