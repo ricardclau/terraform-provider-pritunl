@@ -71,7 +71,7 @@ type ServerPostData struct {
 	NetworkStart     string      `json:"network_start"`
 	Name             string      `json:"name"`
 	PingInterval     int         `json:"ping_interval"`
-	AllowedDevices   string      `json:"allowed_devices"`
+	AllowedDevices   string      `json:"allowed_devices,omitempty"`
 	UsersOnline      int         `json:"users_online"`
 	Ipv6Firewall     bool        `json:"ipv6_firewall"`
 	SessionTimeout   int         `json:"session_timeout"`

@@ -138,8 +138,8 @@ func ResourceServer() *schema.Resource {
 			"allowed_devices": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "any",
-				ValidateFunc: validation.StringInSlice([]string{"any", "mobile", "desktop"}, true),
+				Default:      "",
+				ValidateFunc: validation.StringInSlice([]string{"", "mobile", "desktop"}, true),
 			},
 			"search_domain": {
 				Type:     schema.TypeString,

@@ -9,7 +9,7 @@ import (
 )
 
 var defaultClient = &http.Client{
-	Timeout: 10 * time.Second,
+	Timeout: 60 * time.Second,
 }
 
 func Provider() terraform.ResourceProvider {
