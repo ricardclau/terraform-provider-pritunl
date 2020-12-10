@@ -14,10 +14,15 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
 )
+
+// The Pritunl routes API cannot create multiple routes concurrently and this is why this
+// mutex semaphore is created on create, update and delete operations
+var mutex = &sync.Mutex{}
 
 type PritunlClient struct {
 	client *http.Client
@@ -47,6 +52,8 @@ func NewPritunlClient(host string, token string, secret string, httpClient *http
 }
 
 func (c *PritunlClient) Do(r Request, respVal interface{}) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 
 	url := "https://" + c.host + r.Path
 
@@ -104,6 +111,7 @@ func (c *PritunlClient) Do(r Request, respVal interface{}) error {
 	log.Println(fmt.Sprintf("[DEBUG] Ricard Request: %s", req))
 
 	resp, err := c.client.Do(req)
+
 	if err != nil {
 		return fmt.Errorf("client: Request error: %v", err)
 	}

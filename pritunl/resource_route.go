@@ -5,12 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pritunl/terraform-provider-pritunl/client"
 	"strings"
-	"sync"
 )
-
-// The Pritunl routes API cannot create multiple routes concurrently and this is why this
-// mutex semaphore is created on create, update and delete operations
-var mutex = &sync.Mutex{}
 
 func ResourceRoute() *schema.Resource {
 	return &schema.Resource{
@@ -38,6 +33,7 @@ func ResourceRoute() *schema.Resource {
 			"nat": {
 				Type:     schema.TypeBool,
 				Optional: true,
+				Default:  true,
 			},
 			"nat_interface": {
 				Type:     schema.TypeString,
@@ -77,9 +73,7 @@ func ResourceRouteCreate(d *schema.ResourceData, m interface{}) error {
 		Advertise:    d.Get("advertise").(bool),
 	}
 
-	mutex.Lock()
 	routeData, err := c.RouteCreate(serverId, r)
-	mutex.Unlock()
 
 	if err != nil {
 		return err
@@ -109,10 +103,7 @@ func ResourceRouteUpdate(d *schema.ResourceData, m interface{}) error {
 		Advertise:    d.Get("advertise").(bool),
 	}
 
-	mutex.Lock()
 	_, err = c.RouteUpdate(serverId, routeId, r)
-	mutex.Unlock()
-
 	if err != nil {
 		return err
 	}
@@ -154,9 +145,7 @@ func ResourceRouteDelete(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	mutex.Lock()
 	err = c.RouteDelete(serverId, routeId)
-	mutex.Unlock()
 
 	if err != nil {
 		return err

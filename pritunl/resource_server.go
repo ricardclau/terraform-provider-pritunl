@@ -236,6 +236,17 @@ func ResourceServerCreate(d *schema.ResourceData, m interface{}) error {
 
 	d.SetId(data.Id)
 
+	// Delete default 0.0.0.0/0 route
+	routeData, err := c.RouteGetByNetwork(data.Id, "0.0.0.0/0")
+	if err != nil {
+		return err
+	}
+
+	err = c.RouteDelete(data.Id, routeData.Id)
+	if err != nil {
+		return err
+	}
+
 	return ResourceServerRead(d, m)
 }
 

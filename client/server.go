@@ -139,6 +139,24 @@ func (c *PritunlClient) ServerGet(serverId string) (*ServerData, error) {
 	return data, err
 }
 
+func (c *PritunlClient) ServerStart(serverId string) error {
+	req := Request{
+		Method: "PUT",
+		Path:   fmt.Sprintf("/server/%s/operation/start", serverId),
+	}
+
+	return c.Do(req, nil)
+}
+
+func (c *PritunlClient) ServerStop(serverId string) error {
+	req := Request{
+		Method: "PUT",
+		Path:   fmt.Sprintf("/server/%s/operation/stop", serverId),
+	}
+
+	return c.Do(req, nil)
+}
+
 func (c *PritunlClient) ServerCreate(s ServerPostData) (*ServerData, error) {
 	req := Request{
 		Method: "POST",
