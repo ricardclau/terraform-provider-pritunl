@@ -65,13 +65,13 @@ func ResourceServer() *schema.Resource {
 			"dh_param_bits": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      2048,
+				Default:      4096,
 				ValidateFunc: validation.IntInSlice([]int{1024, 1536, 2048, 3072, 4096}),
 			},
 			"cipher": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "aes128",
+				Default:      "aes256",
 				ValidateFunc: validation.StringInSlice([]string{"bf128", "bf256", "aes128", "aes192", "aes256"}, true),
 			},
 			"ping_interval": {
@@ -122,7 +122,7 @@ func ResourceServer() *schema.Resource {
 			"hash": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "sha1",
+				Default:      "sha512",
 				ValidateFunc: validation.StringInSlice([]string{"md5", "sha1", "sha256", "sha512"}, true),
 			},
 			"ping_timeout": {
@@ -178,7 +178,7 @@ func ResourceServer() *schema.Resource {
 			"inter_client": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
+				Default:  false,
 			},
 			"vxlan": {
 				Type:     schema.TypeBool,
