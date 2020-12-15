@@ -15,7 +15,6 @@ builds:
     ldflags:
       - -s -w -X pritunl/version.ProviderVersion={{.Version}}
     goos:
-      - freebsd
       - windows
       - linux
       - darwin
