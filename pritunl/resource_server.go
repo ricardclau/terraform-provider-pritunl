@@ -50,7 +50,7 @@ func ResourceServer() *schema.Resource {
 			"ipv6": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
+				Default:  true,
 			},
 			"otp_auth": {
 				Type:     schema.TypeBool,
@@ -168,7 +168,7 @@ func ResourceServer() *schema.Resource {
 			"block_outside_dns": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
+				Default:  true,
 			},
 			"dns_mapping": {
 				Type:     schema.TypeBool,
@@ -181,6 +181,11 @@ func ResourceServer() *schema.Resource {
 				Default:  false,
 			},
 			"vxlan": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
+			"ipv6_firewall": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
@@ -227,6 +232,7 @@ func ResourceServerCreate(d *schema.ResourceData, m interface{}) error {
 		DNSMapping:       d.Get("dns_mapping").(bool),
 		InterClient:      d.Get("inter_client").(bool),
 		Vxlan:            d.Get("vxlan").(bool),
+		Ipv6Firewall:     d.Get("ipv6_firewall").(bool),
 	}
 
 	data, err := c.ServerCreate(s)
@@ -289,6 +295,7 @@ func ResourceServerUpdate(d *schema.ResourceData, m interface{}) error {
 		DNSMapping:       d.Get("dns_mapping").(bool),
 		InterClient:      d.Get("inter_client").(bool),
 		Vxlan:            d.Get("vxlan").(bool),
+		Ipv6Firewall:     d.Get("ipv6_firewall").(bool),
 	}
 
 	_, err := c.ServerUpdate(d.Id(), s)
@@ -341,6 +348,7 @@ func ResourceServerRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("dns_mapping", data.DNSMapping)
 	d.Set("inter_client", data.InterClient)
 	d.Set("vxlan", data.Vxlan)
+	d.Set("ipv6_firewall", data.Ipv6Firewall)
 
 	return nil
 }

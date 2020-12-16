@@ -147,6 +147,10 @@ func DataSourceServer() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"ipv6_firewall": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -195,6 +199,7 @@ func DataSourceServerRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("dns_mapping", data.DNSMapping)
 	d.Set("inter_client", data.InterClient)
 	d.Set("vxlan", data.Vxlan)
+	d.Set("ipv6_firewall", data.Ipv6Firewall)
 
 	return nil
 }
